@@ -49,17 +49,19 @@ const XLogo = ({ size = 24, className = "" }: { size?: number, className?: strin
   </svg>
 );
 
+type GameState = 'idle' | 'playing' | 'gameover';
+
 // --- Flappy Krill Underwater Mini Game ---
 const KrillGame: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [gameState, setGameState] = useState<'idle' | 'playing' | 'gameover'>('idle');
+  const [gameState, setGameState] = useState<GameState>('idle');
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [coins, setCoins] = useState(0);
 
-  // Synchronize state to ref for game loop to avoid literal narrowing issues and closure staleness
-  const stateRef = useRef(gameState);
+  // Synchronize state to ref to avoid stale closures in requestAnimationFrame
+  const stateRef = useRef<GameState>(gameState);
   useEffect(() => {
     stateRef.current = gameState;
   }, [gameState]);
@@ -133,7 +135,8 @@ const KrillGame: React.FC = () => {
     if (stateRef.current === 'playing') {
       gameRef.current.velocity = gameRef.current.jumpStrength;
       triggerParticles(80, gameRef.current.shrimpY + 25, 'rgba(56, 189, 248, 0.5)', 4, 0.5);
-    } else if (stateRef.current !== 'playing') {
+    } else {
+      // Logic for idle and gameover
       startGame();
     }
   }, [startGame]);
@@ -158,7 +161,8 @@ const KrillGame: React.FC = () => {
     let animationId: number;
 
     const update = () => {
-      if (stateRef.current !== 'playing') return;
+      // Using direct string comparison to avoid any TS narrowing staleness
+      if ((stateRef.current as string) !== 'playing') return;
 
       const g = gameRef.current;
       g.frame++;
@@ -357,7 +361,7 @@ const KrillGame: React.FC = () => {
     }
 
     return () => cancelAnimationFrame(animationId);
-  }, [gameState]); // Only depend on gameState, score changes are handled via functional updates
+  }, [gameState]); // Restart loop only on main state changes
 
   useEffect(() => {
     if (score > highScore) setHighScore(score);
