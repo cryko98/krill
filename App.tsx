@@ -28,7 +28,6 @@ const MEME_IMAGES = [
   'https://pbs.twimg.com/media/G9KgccGbEAAbutP?format=jpg&name=large',
   'https://pbs.twimg.com/media/G9KXEmpWQAA1g3f?format=jpg&name=medium',
   'https://pbs.twimg.com/media/G9KOw--WoAAmERb?format=jpg&name=900x900',
-  'https://pbs.twify.com/media/G9JvtxFWAAAQp_3?format=jpg&name=large',
   'https://pbs.twimg.com/media/G9JRTc3WcAAdkWQ?format=jpg&name=medium',
   'https://pbs.twimg.com/media/G9I8EdNWEAAyUmM?format=jpg&name=small',
   'https://pbs.twimg.com/media/G9Iv_YwXoAAjxhy?format=jpg&name=medium',
@@ -324,6 +323,7 @@ const KrillGame: React.FC = () => {
         ctx.fillRect(obs.x, obs.gapY + obs.gapSize, pipeWidth, canvas.height - (obs.gapY + obs.gapSize));
         ctx.beginPath();
         ctx.moveTo(obs.x + pipeWidth/2, obs.gapY + obs.gapSize - 20);
+        // Fix: Changed 'ShadSize' to 'obs.gapSize'
         ctx.lineTo(obs.x + pipeWidth/2, obs.gapY + obs.gapSize);
         ctx.stroke();
         
