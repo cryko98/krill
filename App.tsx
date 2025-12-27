@@ -323,7 +323,6 @@ const KrillGame: React.FC = () => {
         ctx.fillRect(obs.x, obs.gapY + obs.gapSize, pipeWidth, canvas.height - (obs.gapY + obs.gapSize));
         ctx.beginPath();
         ctx.moveTo(obs.x + pipeWidth/2, obs.gapY + obs.gapSize - 20);
-        // Fix: Changed 'ShadSize' to 'obs.gapSize'
         ctx.lineTo(obs.x + pipeWidth/2, obs.gapY + obs.gapSize);
         ctx.stroke();
         
@@ -370,33 +369,36 @@ const KrillGame: React.FC = () => {
   return (
     <div 
       ref={containerRef}
-      className="relative w-full max-w-6xl mx-auto rounded-[3rem] overflow-hidden border-8 border-sky-500/20 bg-slate-950 shadow-[0_0_80px_rgba(56,189,248,0.2)] group h-[750px]" 
+      className="relative w-full max-w-6xl mx-auto rounded-3xl md:rounded-[3rem] overflow-hidden border-4 md:border-8 border-sky-500/20 bg-slate-950 shadow-[0_0_80px_rgba(56,189,248,0.2)] group aspect-[1200/750] h-auto" 
       onMouseDown={jump}
     >
-      <div className="absolute top-0 left-0 right-0 p-10 flex justify-between items-start z-20 pointer-events-none select-none">
-        <div className="flex gap-8">
-          <div className="px-8 py-4 bg-slate-900/90 backdrop-blur-3xl rounded-3xl border border-sky-500/40 shadow-2xl">
-            <div className="flex items-center gap-3 mb-1">
-              <TrendingUp size={20} className="text-sky-400" />
-              <span className="text-[11px] text-slate-400 uppercase font-black tracking-[0.2em]">Crashes Dodged</span>
+      <div className="absolute top-0 left-0 right-0 p-4 md:p-10 flex justify-between items-start z-20 pointer-events-none select-none">
+        <div className="flex gap-2 md:gap-8">
+          <div className="px-3 py-2 md:px-8 md:py-4 bg-slate-900/90 backdrop-blur-3xl rounded-xl md:rounded-3xl border border-sky-500/40 shadow-2xl">
+            <div className="flex items-center gap-1 md:gap-3 mb-1">
+              <TrendingUp size={14} className="text-sky-400 md:hidden" />
+              <TrendingUp size={20} className="text-sky-400 hidden md:block" />
+              <span className="text-[7px] md:text-[11px] text-slate-400 uppercase font-black tracking-[0.1em] md:tracking-[0.2em]">Crashes Dodged</span>
             </div>
-            <span className="text-white font-black text-4xl italic">{score}</span>
+            <span className="text-white font-black text-xl md:text-4xl italic">{score}</span>
           </div>
-          <div className="px-8 py-4 bg-slate-900/90 backdrop-blur-3xl rounded-3xl border border-yellow-500/40 shadow-2xl">
-            <div className="flex items-center gap-3 mb-1">
-              <Coins size={20} className="text-yellow-400" />
-              <span className="text-[11px] text-slate-400 uppercase font-black tracking-[0.2em]">Krill Banked</span>
+          <div className="px-3 py-2 md:px-8 md:py-4 bg-slate-900/90 backdrop-blur-3xl rounded-xl md:rounded-3xl border border-yellow-500/40 shadow-2xl">
+            <div className="flex items-center gap-1 md:gap-3 mb-1">
+              <Coins size={14} className="text-yellow-400 md:hidden" />
+              <Coins size={20} className="text-yellow-400 hidden md:block" />
+              <span className="text-[7px] md:text-[11px] text-slate-400 uppercase font-black tracking-[0.1em] md:tracking-[0.2em]">Krill Banked</span>
             </div>
-            <span className="text-yellow-400 font-black text-4xl italic">{coins}</span>
+            <span className="text-yellow-400 font-black text-xl md:text-4xl italic">{coins}</span>
           </div>
         </div>
         
-        <div className="px-8 py-4 bg-slate-900/90 backdrop-blur-3xl rounded-3xl border border-white/20 shadow-2xl">
-          <div className="flex items-center gap-3 mb-1">
-            <Trophy size={20} className="text-slate-500" />
-            <span className="text-[11px] text-slate-400 uppercase font-black tracking-[0.2em]">Deepest Dive</span>
+        <div className="px-3 py-2 md:px-8 md:py-4 bg-slate-900/90 backdrop-blur-3xl rounded-xl md:rounded-3xl border border-white/20 shadow-2xl">
+          <div className="flex items-center gap-1 md:gap-3 mb-1">
+            <Trophy size={14} className="text-slate-500 md:hidden" />
+            <Trophy size={20} className="text-slate-500 hidden md:block" />
+            <span className="text-[7px] md:text-[11px] text-slate-400 uppercase font-black tracking-[0.1em] md:tracking-[0.2em]">High Score</span>
           </div>
-          <span className="text-white/70 font-black text-4xl italic">{highScore}</span>
+          <span className="text-white/70 font-black text-xl md:text-4xl italic">{highScore}</span>
         </div>
       </div>
 
@@ -404,41 +406,43 @@ const KrillGame: React.FC = () => {
         ref={canvasRef} 
         width={1200} 
         height={750} 
-        className="w-full h-full block cursor-pointer select-none"
+        className="w-full h-full block cursor-pointer select-none object-cover"
       />
       
       {gameState === 'idle' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/85 backdrop-blur-3xl transition-all z-30 p-16 text-center">
-          <div className="relative mb-12">
-            <div className="absolute inset-0 bg-sky-500/30 blur-[100px] rounded-full scale-150 animate-pulse"></div>
-            <div className="w-48 h-48 bg-sky-900/30 rounded-full flex items-center justify-center border-4 border-sky-400/50 relative shadow-2xl">
-              <span className="text-9xl">🦐</span>
-              <div className="absolute -bottom-6 -right-6 bg-sky-500 text-white px-6 py-2 rounded-2xl rotate-12 font-black text-lg shadow-2xl border-2 border-white/20">READY?</div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/85 backdrop-blur-3xl transition-all z-30 p-6 md:p-16 text-center">
+          <div className="relative mb-6 md:mb-12">
+            <div className="absolute inset-0 bg-sky-500/30 blur-[60px] md:blur-[100px] rounded-full scale-150 animate-pulse"></div>
+            <div className="w-24 h-24 md:w-48 md:h-48 bg-sky-900/30 rounded-full flex items-center justify-center border-2 md:border-4 border-sky-400/50 relative shadow-2xl">
+              <span className="text-5xl md:text-9xl">🦐</span>
+              <div className="absolute -bottom-3 -right-3 md:-bottom-6 md:-right-6 bg-sky-500 text-white px-3 py-1 md:px-6 md:py-2 rounded-lg md:rounded-2xl rotate-12 font-black text-[10px] md:text-lg shadow-2xl border border-white/20">READY?</div>
             </div>
           </div>
           
-          <h3 className="text-8xl font-black text-white mb-6 uppercase tracking-tighter italic scale-110 electric-glow uppercase">RUG ESCAPE</h3>
-          <p className="text-sky-400 font-bold uppercase tracking-[0.6em] text-lg mb-12">Swim through the crash • Rebuild the community</p>
+          <h3 className="text-4xl md:text-8xl font-black text-white mb-3 md:mb-6 uppercase tracking-tighter italic scale-110 electric-glow">RUG ESCAPE</h3>
+          <p className="text-sky-400 font-bold uppercase tracking-[0.2em] md:tracking-[0.6em] text-[10px] md:text-lg mb-6 md:mb-12 px-4">Swim through the crash • Rebuild the community</p>
           
-          <div className="bg-slate-900/70 p-8 rounded-[2rem] border border-white/10 mb-14 max-w-lg">
-            <div className="flex items-center justify-center gap-10">
-               <div className="flex flex-col items-center gap-3">
-                  <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 text-white shadow-lg">
-                     <ChevronUp size={32} />
+          <div className="bg-slate-900/70 p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-white/10 mb-8 md:mb-14 max-w-xs md:max-w-lg">
+            <div className="flex items-center justify-center gap-6 md:gap-10">
+               <div className="flex flex-col items-center gap-2 md:gap-3">
+                  <div className="w-10 h-10 md:w-16 md:h-16 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center border border-white/20 text-white shadow-lg">
+                     <ChevronUp size={24} className="md:hidden" />
+                     <ChevronUp size={32} className="hidden md:block" />
                   </div>
-                  <span className="text-xs text-white font-black uppercase tracking-widest">Single Tap</span>
+                  <span className="text-[8px] md:text-xs text-white font-black uppercase tracking-widest">Single Tap</span>
                </div>
-               <div className="w-px h-16 bg-white/10"></div>
+               <div className="w-px h-10 md:h-16 bg-white/10"></div>
                <div className="text-left">
-                  <p className="text-white font-black text-sm uppercase mb-1">FLAP TO SURVIVE</p>
-                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Dodge the top and bottom red candles</p>
+                  <p className="text-white font-black text-[10px] md:text-sm uppercase mb-1">FLAP TO SURVIVE</p>
+                  <p className="text-slate-500 text-[8px] md:text-[10px] font-bold uppercase tracking-widest">Dodge the red candles</p>
                </div>
             </div>
           </div>
 
-          <button className="group relative px-24 py-8 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-[2rem] transition-all shadow-[0_0_60px_rgba(2,132,199,0.6)] active:scale-95 text-4xl tracking-tighter italic">
-            <div className="flex items-center gap-6">
-              <Gamepad2 size={48} />
+          <button className="group relative px-10 py-4 md:px-24 md:py-8 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-xl md:rounded-[2rem] transition-all shadow-[0_0_60px_rgba(2,132,199,0.6)] active:scale-95 text-xl md:text-4xl tracking-tighter italic">
+            <div className="flex items-center gap-3 md:gap-6">
+              <Gamepad2 size={24} className="md:hidden" />
+              <Gamepad2 size={48} className="hidden md:block" />
               SWIM FOR GLORY
             </div>
           </button>
@@ -446,36 +450,37 @@ const KrillGame: React.FC = () => {
       )}
 
       {gameState === 'gameover' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/90 backdrop-blur-3xl animate-in fade-in zoom-in duration-300 z-30 p-16 text-center">
-          <div className="text-[12rem] mb-10 drop-shadow-[0_0_50px_rgba(239,68,68,0.7)]">💀</div>
-          <h3 className="text-9xl font-black text-white mb-6 uppercase tracking-tighter italic drop-shadow-2xl">REKT!</h3>
-          <p className="text-red-400 font-black tracking-[0.4em] uppercase mb-16 text-2xl">The market was too volatile.</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/90 backdrop-blur-3xl animate-in fade-in zoom-in duration-300 z-30 p-6 md:p-16 text-center">
+          <div className="text-6xl md:text-[12rem] mb-4 md:mb-10 drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]">💀</div>
+          <h3 className="text-5xl md:text-9xl font-black text-white mb-3 md:mb-6 uppercase tracking-tighter italic drop-shadow-2xl">REKT!</h3>
+          <p className="text-red-400 font-black tracking-[0.2em] md:tracking-[0.4em] uppercase mb-8 md:mb-16 text-sm md:text-2xl">The market was too volatile.</p>
           
-          <div className="grid grid-cols-2 gap-12 mb-20 w-full max-w-4xl">
-            <div className="text-center p-10 bg-slate-950/70 rounded-[3rem] border border-white/15 shadow-2xl">
-              <p className="text-slate-500 text-xs uppercase font-black tracking-[0.3em] mb-4">Total Crashes Avoided</p>
-              <p className="text-white text-8xl font-black leading-none">{score}</p>
+          <div className="grid grid-cols-2 gap-4 md:gap-12 mb-8 md:mb-20 w-full max-w-sm md:max-w-4xl">
+            <div className="text-center p-4 md:p-10 bg-slate-950/70 rounded-2xl md:rounded-[3rem] border border-white/15 shadow-2xl">
+              <p className="text-slate-500 text-[7px] md:text-xs uppercase font-black tracking-[0.1em] md:tracking-[0.3em] mb-2 md:mb-4">Crashes Avoided</p>
+              <p className="text-white text-3xl md:text-8xl font-black leading-none">{score}</p>
             </div>
-            <div className="text-center p-10 bg-slate-950/70 rounded-[3rem] border border-white/15 shadow-2xl">
-              <p className="text-slate-500 text-xs uppercase font-black tracking-[0.3em] mb-4">$KRILL Banked</p>
-              <p className="text-yellow-400 text-8xl font-black leading-none">{coins}</p>
+            <div className="text-center p-4 md:p-10 bg-slate-950/70 rounded-2xl md:rounded-[3rem] border border-white/15 shadow-2xl">
+              <p className="text-slate-500 text-[7px] md:text-xs uppercase font-black tracking-[0.1em] md:tracking-[0.3em] mb-2 md:mb-4">$KRILL Banked</p>
+              <p className="text-yellow-400 text-3xl md:text-8xl font-black leading-none">{coins}</p>
             </div>
           </div>
 
           <button 
             onClick={(e) => { e.stopPropagation(); startGame(); }} 
-            className="group flex items-center gap-8 px-20 py-8 bg-white text-red-600 font-black rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-2xl text-3xl uppercase tracking-tighter"
+            className="group flex items-center gap-3 md:gap-8 px-8 py-4 md:px-20 md:py-8 bg-white text-red-600 font-black rounded-xl md:rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-2xl text-lg md:text-3xl uppercase tracking-tighter"
           >
-            <RefreshCcw size={40} className="group-hover:rotate-180 transition-transform duration-1000" />
-            RESPAWN IN THE DEEP
+            <RefreshCcw size={20} className="md:hidden group-hover:rotate-180 transition-transform duration-1000" />
+            <RefreshCcw size={40} className="hidden md:block group-hover:rotate-180 transition-transform duration-1000" />
+            RESPAWN
           </button>
         </div>
       )}
 
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 pointer-events-none z-20 opacity-40 group-hover:opacity-100 transition-opacity">
-        <div className="flex gap-8 items-center bg-slate-900/95 px-12 py-4 rounded-full border border-white/15 shadow-2xl backdrop-blur-3xl">
-          <span className="text-sm text-sky-400 uppercase font-black tracking-[0.4em]">Tap to Swim - Don't Get Rugged</span>
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_20px_#22c55e]"></div>
+      <div className="absolute bottom-4 md:bottom-12 left-1/2 -translate-x-1/2 pointer-events-none z-20 opacity-40 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-4 md:gap-8 items-center bg-slate-900/95 px-6 py-2 md:px-12 md:py-4 rounded-full border border-white/15 shadow-2xl backdrop-blur-3xl">
+          <span className="text-[8px] md:text-sm text-sky-400 uppercase font-black tracking-[0.2em] md:tracking-[0.4em]">Tap to Swim - Don't Get Rugged</span>
+          <div className="w-1.5 h-1.5 md:w-3 md:h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_20px_#22c55e]"></div>
         </div>
       </div>
     </div>
@@ -508,7 +513,7 @@ const App: React.FC = () => {
 
             <div className="hidden md:flex items-center gap-8 font-medium">
               <a href="#about" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">About</a>
-              <a href="#arcade" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">Arcade</a>
+              <a href="#arcade" className="hidden md:block hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">Arcade</a>
               <a href="#memes" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">Memes</a>
               <a href="#how-to-buy" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">How to Buy</a>
               <a href="#chart" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">Live Chart</a>
@@ -532,7 +537,6 @@ const App: React.FC = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-slate-900 border-b border-sky-900/50 p-4 space-y-4 animate-in slide-in-from-top duration-300">
             <a href="#about" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>About</a>
-            <a href="#arcade" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Arcade</a>
             <a href="#memes" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Memes</a>
             <a href="#how-to-buy" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>How to Buy</a>
             <a href="#chart" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Live Chart</a>
@@ -662,22 +666,22 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        <section id="arcade" className="py-32 px-4 bg-slate-900/50 relative overflow-hidden">
+        <section id="arcade" className="hidden md:block py-32 px-4 bg-slate-900/50 relative overflow-hidden">
           <div className="max-w-7xl mx-auto relative z-10 text-center">
             <div className="mb-20">
               <div className="inline-flex items-center gap-2 px-6 py-2 bg-sky-500/10 border border-sky-500/30 rounded-full text-sky-400 text-xs font-black tracking-[0.4em] uppercase mb-8 shadow-xl">
                 Arcade Sector Alpha
               </div>
-              <h2 className="text-8xl font-black text-white mb-8 italic tracking-tighter uppercase drop-shadow-2xl electric-glow">RUG ESCAPE</h2>
-              <p className="text-slate-400 max-w-3xl mx-auto text-2xl mb-14 leading-relaxed font-medium">The market is crashing. The pipes are red. The swarm is your only hope. Tap to stay afloat in the deep ocean of volatility.</p>
+              <h2 className="text-5xl md:text-8xl font-black text-white mb-8 italic tracking-tighter uppercase drop-shadow-2xl electric-glow">RUG ESCAPE</h2>
+              <p className="text-slate-400 max-w-3xl mx-auto text-lg md:text-2xl mb-14 leading-relaxed font-medium">The market is crashing. The pipes are red. The swarm is your only hope. Tap to stay afloat in the deep ocean of volatility.</p>
               
-              <div className="flex flex-wrap justify-center gap-8 mb-16 text-sm uppercase font-black tracking-[0.2em] text-sky-400/80">
-                <span className="flex items-center gap-3 px-6 py-3 bg-slate-900/60 rounded-2xl border border-sky-400/30 shadow-2xl transition-all hover:bg-sky-900/80">
-                  <div className="w-3 h-3 bg-sky-400 rounded-full animate-ping"></div>
+              <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-16 text-[10px] md:text-sm uppercase font-black tracking-[0.2em] text-sky-400/80">
+                <span className="flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-slate-900/60 rounded-2xl border border-sky-400/30 shadow-2xl transition-all hover:bg-sky-900/80">
+                  <div className="w-2 h-2 md:w-3 md:h-3 bg-sky-400 rounded-full animate-ping"></div>
                   Snappy Flap Controls
                 </span>
-                <span className="flex items-center gap-3 px-6 py-3 bg-slate-900/60 rounded-2xl border border-sky-400/30 shadow-2xl transition-all hover:bg-sky-900/80">
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                <span className="flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-slate-900/60 rounded-2xl border border-sky-400/30 shadow-2xl transition-all hover:bg-sky-900/80">
+                  <div className="w-2 h-2 md:w-3 md:h-3 bg-yellow-400 rounded-full"></div>
                   Stack $KRILL Bonus
                 </span>
               </div>
@@ -794,7 +798,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="aspect-[16/9] w-full rounded-[3rem] overflow-hidden border border-sky-500/20 shadow-2xl bg-slate-900 ring-8 ring-sky-500/5">
+            <div className="h-[600px] md:h-auto md:aspect-[16/9] w-full rounded-3xl md:rounded-[3rem] overflow-hidden border border-sky-500/20 shadow-2xl bg-slate-900 ring-4 md:ring-8 ring-sky-500/5">
               <iframe 
                 src={`https://dexscreener.com/solana/${CONTRACT_ADDRESS}?embed=1&theme=dark&trades=0&info=0`} 
                 className="w-full h-full"
@@ -829,7 +833,7 @@ const App: React.FC = () => {
               </div>
               <div className="flex gap-10 text-xs uppercase font-black tracking-[0.3em] text-slate-500">
                  <a href="#about" className="hover:text-sky-400 transition-colors">About</a>
-                 <a href="#arcade" className="hover:text-sky-400 transition-colors">Arcade</a>
+                 <a href="#memes" className="hover:text-sky-400 transition-colors">Memes</a>
                  <a href="#how-to-buy" className="hover:text-sky-400 transition-colors">Buy</a>
               </div>
             </div>
