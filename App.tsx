@@ -58,6 +58,12 @@ const KrillGame: React.FC = () => {
   const [highScore, setHighScore] = useState(0);
   const [coins, setCoins] = useState(0);
 
+  // Synchronize state to ref for game loop to avoid literal narrowing issues and closure staleness
+  const stateRef = useRef(gameState);
+  useEffect(() => {
+    stateRef.current = gameState;
+  }, [gameState]);
+
   const gameRef = useRef({
     shrimpY: 300,
     velocity: 0,
@@ -124,13 +130,13 @@ const KrillGame: React.FC = () => {
       e.preventDefault();
     }
 
-    if (gameState === 'playing') {
+    if (stateRef.current === 'playing') {
       gameRef.current.velocity = gameRef.current.jumpStrength;
       triggerParticles(80, gameRef.current.shrimpY + 25, 'rgba(56, 189, 248, 0.5)', 4, 0.5);
-    } else if (gameState !== 'playing') {
+    } else if (stateRef.current !== 'playing') {
       startGame();
     }
-  }, [gameState, startGame]);
+  }, [startGame]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -152,11 +158,11 @@ const KrillGame: React.FC = () => {
     let animationId: number;
 
     const update = () => {
-      if (gameState !== 'playing') return;
+      if (stateRef.current !== 'playing') return;
 
       const g = gameRef.current;
       g.frame++;
-      g.speed = 4 + Math.floor(g.frame / 800) * 0.5; // Scale speed slower for Flappy feel
+      g.speed = 4 + Math.floor(g.frame / 800) * 0.5;
       
       // Physics
       g.velocity += g.gravity;
@@ -173,12 +179,13 @@ const KrillGame: React.FC = () => {
 
       // Bubbles
       if (g.frame % 30 === 0) spawnBubble();
-      g.bubbles.forEach((b, i) => {
+      for (let i = g.bubbles.length - 1; i >= 0; i--) {
+        const b = g.bubbles[i];
         b.y -= b.speed;
         if (b.y < -20) g.bubbles.splice(i, 1);
-      });
+      }
 
-      // Spawn Obstacles (Double Candles / Pipes)
+      // Spawn Obstacles
       if (g.frame % 100 === 0) {
         const gapSize = Math.max(160, 220 - (g.frame / 500));
         const gapY = 100 + Math.random() * (canvas.height - gapSize - 200);
@@ -218,18 +225,13 @@ const KrillGame: React.FC = () => {
       g.obstacles = g.obstacles.filter(obs => {
         obs.x -= g.speed;
 
-        // Collision detection
-        if (
-          shrimpX + shrimpSize > obs.x &&
-          shrimpX < obs.x + 60 // Pipe width
-        ) {
+        if (shrimpX + shrimpSize > obs.x && shrimpX < obs.x + 60) {
           if (g.shrimpY < obs.gapY || g.shrimpY + shrimpSize > obs.gapY + obs.gapSize) {
              setGameState('gameover');
              triggerParticles(shrimpX + 15, g.shrimpY + 15, '#ef4444', 30, 3);
           }
         }
 
-        // Score tracking
         if (!obs.passed && obs.x + 60 < shrimpX) {
           obs.passed = true;
           setScore(s => s + 1);
@@ -300,16 +302,14 @@ const KrillGame: React.FC = () => {
       });
       ctx.globalAlpha = 1.0;
 
-      // 5. Obstacles (Double Red Candles)
+      // 5. Obstacles
       g.obstacles.forEach(obs => {
         ctx.fillStyle = '#ef4444';
         ctx.shadowBlur = 20;
         ctx.shadowColor = 'rgba(239, 68, 68, 0.4)';
         
         const pipeWidth = 60;
-        // Top Candle
         ctx.fillRect(obs.x, 0, pipeWidth, obs.gapY);
-        // Top Candle Wick (pointing down)
         ctx.beginPath();
         ctx.moveTo(obs.x + pipeWidth/2, obs.gapY);
         ctx.lineTo(obs.x + pipeWidth/2, obs.gapY + 20);
@@ -317,9 +317,7 @@ const KrillGame: React.FC = () => {
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // Bottom Candle
         ctx.fillRect(obs.x, obs.gapY + obs.gapSize, pipeWidth, canvas.height - (obs.gapY + obs.gapSize));
-        // Bottom Candle Wick (pointing up)
         ctx.beginPath();
         ctx.moveTo(obs.x + pipeWidth/2, obs.gapY + obs.gapSize - 20);
         ctx.lineTo(obs.x + pipeWidth/2, obs.gapY + obs.gapSize);
@@ -328,19 +326,18 @@ const KrillGame: React.FC = () => {
         ctx.shadowBlur = 0;
       });
 
-      // 6. Player (🦐)
+      // 6. Player
       ctx.font = '58px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.save();
       ctx.translate(80, g.shrimpY + 25);
-      // Flappy bird style rotation
       const rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, g.velocity * 0.1));
       ctx.rotate(rotation);
       ctx.fillText('🦐', 0, 0);
       ctx.restore();
 
-      if (gameState === 'playing') {
+      if (stateRef.current === 'playing') {
         animationId = requestAnimationFrame(() => {
           update();
           draw();
@@ -348,7 +345,7 @@ const KrillGame: React.FC = () => {
       }
     };
 
-    if (gameState === 'playing') {
+    if (stateRef.current === 'playing') {
       draw();
     } else {
       ctx.fillStyle = '#020617';
@@ -360,7 +357,7 @@ const KrillGame: React.FC = () => {
     }
 
     return () => cancelAnimationFrame(animationId);
-  }, [gameState, score]);
+  }, [gameState]); // Only depend on gameState, score changes are handled via functional updates
 
   useEffect(() => {
     if (score > highScore) setHighScore(score);
@@ -372,7 +369,6 @@ const KrillGame: React.FC = () => {
       className="relative w-full max-w-6xl mx-auto rounded-[3rem] overflow-hidden border-8 border-sky-500/20 bg-slate-950 shadow-[0_0_80px_rgba(56,189,248,0.2)] group h-[750px]" 
       onMouseDown={jump}
     >
-      {/* HUD - Elevated for visibility */}
       <div className="absolute top-0 left-0 right-0 p-10 flex justify-between items-start z-20 pointer-events-none select-none">
         <div className="flex gap-8">
           <div className="px-8 py-4 bg-slate-900/90 backdrop-blur-3xl rounded-3xl border border-sky-500/40 shadow-2xl">
@@ -417,7 +413,7 @@ const KrillGame: React.FC = () => {
             </div>
           </div>
           
-          <h3 className="text-8xl font-black text-white mb-6 uppercase tracking-tighter italic scale-110 electric-glow">RUG ESCAPE</h3>
+          <h3 className="text-8xl font-black text-white mb-6 uppercase tracking-tighter italic scale-110 electric-glow uppercase">RUG ESCAPE</h3>
           <p className="text-sky-400 font-bold uppercase tracking-[0.6em] text-lg mb-12">Swim through the crash • Rebuild the community</p>
           
           <div className="bg-slate-900/70 p-8 rounded-[2rem] border border-white/10 mb-14 max-w-lg">
@@ -494,12 +490,10 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-slate-950 text-slate-200">
-      {/* Background Decor */}
       <div className="fixed inset-0 bg-grid pointer-events-none z-0"></div>
       <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none"></div>
 
-      {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-sky-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
@@ -546,7 +540,6 @@ const App: React.FC = () => {
       </nav>
 
       <main className="relative z-10">
-        {/* Hero */}
         <section className="pt-32 pb-20 px-4">
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-center lg:text-left space-y-8">
@@ -600,7 +593,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Accountability Banner */}
         <section className="bg-[#0084cc] py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-15 pointer-events-none" style={{
             backgroundImage: 'radial-gradient(circle, #fff 1.5px, transparent 0)',
@@ -631,7 +623,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* About */}
         <section id="about" className="py-24 px-4 bg-slate-950">
           <div className="max-w-5xl mx-auto space-y-16">
             <div className="relative group overflow-hidden rounded-3xl border border-sky-500/20 shadow-2xl">
@@ -667,7 +658,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Arcade */}
         <section id="arcade" className="py-32 px-4 bg-slate-900/50 relative overflow-hidden">
           <div className="max-w-7xl mx-auto relative z-10 text-center">
             <div className="mb-20">
@@ -693,7 +683,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Memes */}
         <section id="memes" className="py-24 px-4 bg-slate-900/30">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
@@ -725,7 +714,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* How to Buy */}
         <section id="how-to-buy" className="py-24 px-4 relative">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
@@ -787,7 +775,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Chart */}
         <section id="chart" className="py-24 px-4 bg-slate-900/50">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row items-end justify-between mb-8 gap-4">
@@ -814,7 +801,6 @@ const App: React.FC = () => {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="py-20 border-t border-sky-900/30 px-4 relative z-10 bg-slate-950">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-16 mb-16">
