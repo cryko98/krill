@@ -23,6 +23,7 @@ const TICKER = '$KRILL';
 const X_COMMUNITY_URL = 'https://x.com/i/communities/2004690431997514205';
 const LOGO_URL = 'https://wkkeyyrknmnynlcefugq.supabase.co/storage/v1/object/public/wasd/logo%20-%202025-12-27T113916.213.png';
 const ABOUT_HERO_IMAGE = 'https://pbs.twimg.com/community_banner_img/2004699893252718592/sALg042A?format=jpg&name=small';
+const NARRATIVE_IMAGE = 'https://pbs.twimg.com/media/G9KFzW0WkAA9Zqi?format=jpg&name=large';
 
 const MEME_IMAGES = [
   'https://pbs.twimg.com/media/G9KgccGbEAAbutP?format=jpg&name=large',
@@ -661,6 +662,20 @@ const App: React.FC = () => {
                 <p className="font-bold text-white text-2xl uppercase tracking-tighter italic border-b-2 border-sky-500/30 pb-2">
                   Accountability matters. This is the Krill Uprising.
                 </p>
+              </div>
+            </div>
+
+            <div className="relative group overflow-hidden rounded-3xl border border-sky-500/20 shadow-2xl bg-slate-900/50">
+              <img 
+                src={NARRATIVE_IMAGE} 
+                alt="Krill Narrative" 
+                className="w-full h-auto object-cover transform transition-transform duration-700" 
+              />
+              <div className="p-8 md:p-12 text-center">
+                <p className="text-xl md:text-3xl font-black text-white italic leading-relaxed tracking-tight">
+                  "The krill, a narrative tied to the white whale which is at 23M marketcap on the moment of writing this. I like the idea of the krill even more."
+                </p>
+                <div className="h-1 w-24 bg-sky-500 mx-auto mt-8 rounded-full"></div>
               </div>
             </div>
           </div>
