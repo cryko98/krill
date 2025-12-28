@@ -11,16 +11,18 @@ import {
   Menu, 
   X as CloseIcon,
   Image as ImageIcon,
-  Gamepad2,
-  RefreshCcw,
-  Trophy,
-  Coins,
-  ChevronUp
+  Gamepad2, 
+  RefreshCcw, 
+  Trophy, 
+  Coins, 
+  ChevronUp,
+  Mail
 } from 'lucide-react';
 
 const CONTRACT_ADDRESS = 'WchjLJqbq8AY283hoYKLs7ikBVYbnxUD8aHZf5upump';
 const TICKER = '$KRILL';
 const X_COMMUNITY_URL = 'https://x.com/i/communities/2004690431997514205';
+const CONTACT_EMAIL = 'thekrillonsoll@gmail.com';
 const LOGO_URL = 'https://wkkeyyrknmnynlcefugq.supabase.co/storage/v1/object/public/wasd/logo%20-%202025-12-27T113916.213.png';
 const ABOUT_HERO_IMAGE = 'https://pbs.twimg.com/community_banner_img/2004699893252718592/sALg042A?format=jpg&name=small';
 const NARRATIVE_IMAGE = 'https://pbs.twimg.com/media/G9KFzW0WkAA9Zqi?format=jpg&name=large';
@@ -838,7 +840,11 @@ const App: React.FC = () => {
             </div>
             
             <div className="flex flex-col items-center md:items-end gap-10">
-               <div className="flex gap-10">
+               <div className="flex gap-10 items-center">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-slate-400 hover:text-sky-400 transition-all hover:scale-125 p-3 rounded-full bg-slate-900 border border-slate-800 shadow-xl flex items-center gap-3">
+                  <Mail size={32} />
+                  <span className="hidden md:inline text-xs font-black uppercase tracking-widest">{CONTACT_EMAIL}</span>
+                </a>
                 <a href={X_COMMUNITY_URL} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-sky-400 transition-all hover:scale-125 p-3 rounded-full bg-slate-900 border border-slate-800 shadow-xl">
                   <XLogo size={32} />
                 </a>
@@ -855,6 +861,7 @@ const App: React.FC = () => {
           </div>
           
           <div className="text-center text-slate-600 text-[10px] border-t border-slate-900 pt-16">
+            <p className="mb-4 font-black uppercase tracking-[0.3em] text-slate-400">CONTACT: {CONTACT_EMAIL}</p>
             <p className="mb-8 font-black uppercase tracking-[0.3em] text-slate-500">© 2025 THE KRILL COMMUNITY • UNIFIED BY ACCIDENT, HELD BY STRENGTH</p>
             <p className="max-w-5xl mx-auto opacity-30 uppercase tracking-[0.1em] leading-relaxed italic">
               LEGAL NOTICE: $KRILL IS A MEMETIC EXPRESSION OF COMMUNITY DISCONTENT AND RESILIENCE. IT HOLDS NO CONTRACTUAL VALUE, NO PROMISE OF PROFITS, AND NO FORMAL ORGANIZATION. TRADING IN VOLATILE ASSETS IS EXTREMELY RISKY. CONDUCT YOUR OWN RESEARCH AND INVEST RESPONSIBLY.
