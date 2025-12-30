@@ -21,7 +21,7 @@ import {
 
 const CONTRACT_ADDRESS = 'WchjLJqbq8AY283hoYKLs7ikBVYbnxUD8aHZf5upump';
 const TICKER = '$KRILL';
-const X_COMMUNITY_URL = 'https://x.com/i/communities/2004690431997514205';
+const X_COMMUNITY_URL = 'https://i.com/i/communities/2004690431997514205';
 const CONTACT_EMAIL = 'thekrillonsoll@gmail.com';
 const LOGO_URL = 'https://wkkeyyrknmnynlcefugq.supabase.co/storage/v1/object/public/wasd/logo%20-%202025-12-27T113916.213.png';
 const ABOUT_HERO_IMAGE = 'https://pbs.twimg.com/community_banner_img/2004699893252718592/sALg042A?format=jpg&name=small';
@@ -129,14 +129,14 @@ const KrillGame: React.FC = () => {
   }, []);
 
   const jump = useCallback((e?: any) => {
-    if (e && e.preventDefault && typeof e.preventDefault === 'function') {
+    if (e && e.preventDefault) {
       e.preventDefault();
     }
 
     if (stateRef.current === 'playing') {
       gameRef.current.velocity = gameRef.current.jumpStrength;
-      triggerParticles(80, gameRef.current.shrimpY + 25, 'rgba(56, 189, 248, 0.5)', 4, 0.5);
-    } else if (stateRef.current !== 'playing') {
+      triggerParticles(120, gameRef.current.shrimpY + 25, 'rgba(56, 189, 248, 0.5)', 4, 0.5);
+    } else {
       startGame();
     }
   }, [startGame]);
@@ -215,7 +215,7 @@ const KrillGame: React.FC = () => {
         if (p.life <= 0) g.particles.splice(i, 1);
       }
 
-      const shrimpX = 80;
+      const shrimpX = 120;
       const shrimpSize = 35;
 
       g.obstacles = g.obstacles.filter(obs => {
@@ -301,11 +301,11 @@ const KrillGame: React.FC = () => {
         ctx.shadowBlur = 0;
       });
 
-      ctx.font = '58px serif';
+      ctx.font = '64px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.save();
-      ctx.translate(80, g.shrimpY + 25);
+      ctx.translate(120, g.shrimpY + 25);
       const rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, g.velocity * 0.1));
       ctx.rotate(rotation);
       ctx.fillText('🦐', 0, 0);
@@ -340,7 +340,7 @@ const KrillGame: React.FC = () => {
   return (
     <div 
       ref={containerRef}
-      className="relative w-full max-w-6xl mx-auto rounded-3xl md:rounded-[3rem] overflow-hidden border-4 md:border-8 border-sky-500/20 bg-slate-950 shadow-[0_0_80px_rgba(56,189,248,0.2)] group aspect-[4/5] md:aspect-[1200/750] h-auto select-none touch-none" 
+      className="relative w-full max-w-6xl mx-auto rounded-3xl md:rounded-[3rem] overflow-hidden border-4 md:border-8 border-sky-500/20 bg-slate-950 shadow-[0_0_80px_rgba(56,189,248,0.2)] group aspect-[1200/750] h-auto select-none touch-none" 
       onMouseDown={jump}
       onTouchStart={jump}
     >
@@ -350,17 +350,17 @@ const KrillGame: React.FC = () => {
             <div className="flex items-center gap-1 md:gap-3 mb-0 md:mb-1">
               <TrendingUp size={12} className="text-sky-400 md:hidden" />
               <TrendingUp size={20} className="text-sky-400 hidden md:block" />
-              <span className="text-[7px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">Dodged</span>
+              <span className="text-[8px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">Score</span>
             </div>
-            <span className="text-white font-black text-lg md:text-4xl italic">{score}</span>
+            <span className="text-white font-black text-xl md:text-4xl italic">{score}</span>
           </div>
           <div className="px-3 py-1.5 md:px-8 md:py-4 bg-slate-900/95 backdrop-blur-3xl rounded-xl md:rounded-3xl border border-yellow-500/40 shadow-2xl">
             <div className="flex items-center gap-1 md:gap-3 mb-0 md:mb-1">
               <Coins size={12} className="text-yellow-400 md:hidden" />
               <Coins size={20} className="text-yellow-400 hidden md:block" />
-              <span className="text-[7px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">Banked</span>
+              <span className="text-[8px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">Krill</span>
             </div>
-            <span className="text-yellow-400 font-black text-lg md:text-4xl italic">{coins}</span>
+            <span className="text-yellow-400 font-black text-xl md:text-4xl italic">{coins}</span>
           </div>
         </div>
         
@@ -368,9 +368,9 @@ const KrillGame: React.FC = () => {
           <div className="flex items-center gap-1 md:gap-3 mb-0 md:mb-1">
             <Trophy size={12} className="text-slate-500 md:hidden" />
             <Trophy size={20} className="text-slate-500 hidden md:block" />
-            <span className="text-[7px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">High</span>
+            <span className="text-[8px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">High</span>
           </div>
-          <span className="text-white/70 font-black text-lg md:text-4xl italic">{highScore}</span>
+          <span className="text-white/70 font-black text-xl md:text-4xl italic">{highScore}</span>
         </div>
       </div>
 
@@ -378,29 +378,29 @@ const KrillGame: React.FC = () => {
         ref={canvasRef} 
         width={1200} 
         height={750} 
-        className="w-full h-full block cursor-pointer select-none object-cover"
+        className="w-full h-full block cursor-pointer select-none object-contain"
       />
       
       {gameState === 'idle' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-3xl transition-all z-30 p-4 md:p-16 text-center">
           <div className="relative mb-6 md:mb-12">
             <div className="absolute inset-0 bg-sky-500/30 blur-[60px] md:blur-[100px] rounded-full scale-150 animate-pulse"></div>
-            <div className="w-20 h-20 md:w-48 md:h-48 bg-sky-900/30 rounded-full flex items-center justify-center border-2 md:border-4 border-sky-400/50 relative shadow-2xl">
-              <span className="text-4xl md:text-9xl">🦐</span>
+            <div className="w-24 h-24 md:w-48 md:h-48 bg-sky-900/30 rounded-full flex items-center justify-center border-2 md:border-4 border-sky-400/50 relative shadow-2xl">
+              <span className="text-5xl md:text-9xl">🦐</span>
             </div>
           </div>
           
           <h3 className="text-4xl md:text-8xl font-black text-white mb-3 md:mb-6 uppercase tracking-tighter italic scale-110 electric-glow">RUG ESCAPE</h3>
-          <p className="text-sky-400 font-bold uppercase tracking-widest text-[9px] md:text-lg mb-6 md:mb-12 px-4">Swim through the crash • Rebuild the community</p>
+          <p className="text-sky-400 font-bold uppercase tracking-widest text-[10px] md:text-lg mb-6 md:mb-12 px-4">Swim through the crash • Rebuild the community</p>
           
           <div className="bg-slate-900/80 p-4 md:p-8 rounded-2xl md:rounded-[2rem] border border-white/10 mb-8 md:mb-14 max-w-xs md:max-w-lg">
             <div className="flex items-center justify-center gap-4 md:gap-10">
                <div className="flex flex-col items-center gap-1 md:gap-3">
                   <div className="w-10 h-10 md:w-16 md:h-16 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center border border-white/20 text-white shadow-lg">
-                     <ChevronUp size={20} className="md:hidden" />
+                     <ChevronUp size={24} className="md:hidden" />
                      <ChevronUp size={32} className="hidden md:block" />
                   </div>
-                  <span className="text-[8px] md:text-xs text-white font-black uppercase tracking-widest">Tap</span>
+                  <span className="text-[10px] md:text-xs text-white font-black uppercase tracking-widest">Tap</span>
                </div>
                <div className="w-px h-10 md:h-16 bg-white/10"></div>
                <div className="text-left">
@@ -410,7 +410,7 @@ const KrillGame: React.FC = () => {
             </div>
           </div>
 
-          <button className="group relative px-10 py-4 md:px-24 md:py-8 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-xl md:rounded-[2rem] transition-all shadow-[0_0_60px_rgba(2,132,199,0.6)] active:scale-95 text-lg md:text-4xl tracking-tighter italic">
+          <button className="group relative px-10 py-4 md:px-24 md:py-8 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-xl md:rounded-[2rem] transition-all shadow-[0_0_60px_rgba(2,132,199,0.6)] active:scale-95 text-xl md:text-4xl tracking-tighter italic">
              START SWIMMING
           </button>
         </div>
