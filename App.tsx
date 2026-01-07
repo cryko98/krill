@@ -1,41 +1,28 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import { 
   Copy, 
   Check, 
   ExternalLink, 
   Wallet, 
   Rocket, 
-  ShieldAlert, 
   TrendingUp, 
   Menu, 
   X as CloseIcon,
-  Image as ImageIcon,
-  Gamepad2, 
-  RefreshCcw, 
-  Trophy, 
-  Coins, 
-  ChevronUp,
-  Mail
 } from 'lucide-react';
 
-const CONTRACT_ADDRESS = 'WchjLJqbq8AY283hoYKLs7ikBVYbnxUD8aHZf5upump';
-const TICKER = '$KRILL';
-const X_COMMUNITY_URL = 'https://i.com/i/communities/2004690431997514205';
-const CONTACT_EMAIL = 'thekrillonsoll@gmail.com';
-const LOGO_URL = 'https://wkkeyyrknmnynlcefugq.supabase.co/storage/v1/object/public/wasd/logo%20-%202025-12-27T113916.213.png';
-const ABOUT_HERO_IMAGE = 'https://pbs.twimg.com/community_banner_img/2004699893252718592/sALg042A?format=jpg&name=small';
-const NARRATIVE_IMAGE = 'https://pbs.twimg.com/media/G9KFzW0WkAA9Zqi?format=jpg&name=large';
+const CONTRACT_ADDRESS = 'FquUHKWfMUdSMxxSU9ZWrSc98hvTXeMnQn9nksSKpump';
+const TICKER = '$42069';
+const X_COMMUNITY_URL = 'https://x.com/42069_OnSol';
+const LOGO_URL = 'https://pbs.twimg.com/media/G-EMbPiWkAApwjp?format=jpg&name=small';
+const IMAGE_BANNER = 'https://pbs.twimg.com/profile_banners/2008891683560443904/1767793153/600x200';
 
-const MEME_IMAGES = [
-  'https://pbs.twimg.com/media/G9KgccGbEAAbutP?format=jpg&name=large',
-  'https://pbs.twimg.com/media/G9KXEmpWQAA1g3f?format=jpg&name=medium',
-  'https://pbs.twimg.com/media/G9KOw--WoAAmERb?format=jpg&name=900x900',
-  'https://pbs.twimg.com/media/G9JRTc3WcAAdkWQ?format=jpg&name=medium',
-  'https://pbs.twimg.com/media/G9I8EdNWEAAyUmM?format=jpg&name=small',
-  'https://pbs.twimg.com/media/G9Iv_YwXoAAjxhy?format=jpg&name=medium',
-  'https://pbs.twimg.com/media/G9IqGlgXEAA0Fs4?format=jpg&name=large',
-  'https://pbs.twimg.com/media/G9IaLx8XQAALtdo?format=jpg&name=medium'
+const SCATTER_IMAGES = [
+  'https://i.redd.it/8talrf7kbgu41.jpg',
+  'https://insidetesla.de/wp-content/uploads/2023/02/tesla-ceo-elon-musk-freigesprochen-prozess-tweet-1024x576.jpg',
+  'https://pbs.twimg.com/media/FmxM-QGagAAfcX4.jpg',
+  'https://www.the-sun.com/wp-content/uploads/sites/6/2022/04/NINTCHDBPICT000726187634.jpg?strip=all&w=932',
+  'https://img.ifunny.co/images/df9f5a49f8c1c4322c5aec06ea5b57191bb0d765ad106b1f310bfa82554b4e17_1.jpg'
 ];
 
 const XLogo = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
@@ -51,407 +38,6 @@ const XLogo = ({ size = 24, className = "" }: { size?: number, className?: strin
   </svg>
 );
 
-type GameState = 'idle' | 'playing' | 'gameover';
-
-// --- Flappy Krill Underwater Mini Game ---
-const KrillGame: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [gameState, setGameState] = useState<GameState>('idle');
-  const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(0);
-  const [coins, setCoins] = useState(0);
-
-  const stateRef = useRef<GameState>(gameState);
-  useEffect(() => {
-    stateRef.current = gameState;
-  }, [gameState]);
-
-  const gameRef = useRef({
-    shrimpY: 300,
-    velocity: 0,
-    obstacles: [] as { x: number; gapY: number; gapSize: number; passed: boolean }[],
-    tokens: [] as { x: number; y: number; collected: boolean }[],
-    bubbles: [] as { x: number; y: number; speed: number; size: number }[],
-    particles: [] as { x: number; y: number; vx: number; vy: number; life: number; color: string }[],
-    backgroundX: 0,
-    frame: 0,
-    speed: 4,
-    gravity: 0.35,
-    jumpStrength: -7.5,
-  });
-
-  const triggerParticles = (x: number, y: number, color: string, count = 8, scale = 1) => {
-    for (let i = 0; i < count; i++) {
-      gameRef.current.particles.push({
-        x,
-        y,
-        vx: (Math.random() - 0.5) * 6 * scale,
-        vy: (Math.random() - 0.5) * 6 * scale,
-        life: 1,
-        color
-      });
-    }
-  };
-
-  const spawnBubble = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    gameRef.current.bubbles.push({
-      x: Math.random() * canvas.width,
-      y: canvas.height + 20,
-      speed: 1 + Math.random() * 2,
-      size: 2 + Math.random() * 8
-    });
-  }, []);
-
-  const startGame = useCallback(() => {
-    setGameState('playing');
-    setScore(0);
-    setCoins(0);
-    gameRef.current = {
-      ...gameRef.current,
-      shrimpY: 300,
-      velocity: 0,
-      obstacles: [],
-      tokens: [],
-      particles: [],
-      bubbles: Array.from({ length: 15 }).map(() => ({
-        x: Math.random() * 1200,
-        y: Math.random() * 600,
-        speed: 1 + Math.random() * 2,
-        size: 2 + Math.random() * 8
-      })),
-      backgroundX: 0,
-      frame: 0,
-      speed: 4,
-    };
-  }, []);
-
-  const jump = useCallback((e?: any) => {
-    if (e && e.preventDefault) {
-      e.preventDefault();
-    }
-
-    if (stateRef.current === 'playing') {
-      gameRef.current.velocity = gameRef.current.jumpStrength;
-      triggerParticles(120, gameRef.current.shrimpY + 25, 'rgba(56, 189, 248, 0.5)', 4, 0.5);
-    } else {
-      startGame();
-    }
-  }, [startGame]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === ' ' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        jump();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [jump]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationId: number;
-
-    const update = () => {
-      if (stateRef.current !== 'playing') return;
-
-      const g = gameRef.current;
-      g.frame++;
-      g.speed = 4 + Math.floor(g.frame / 800) * 0.5;
-      
-      g.velocity += g.gravity;
-      g.shrimpY += g.velocity;
-
-      if (g.shrimpY > canvas.height - 50) {
-         setGameState('gameover');
-      }
-      if (g.shrimpY < 0) {
-        g.shrimpY = 0;
-        g.velocity = 0;
-      }
-
-      if (g.frame % 30 === 0) spawnBubble();
-      for (let i = g.bubbles.length - 1; i >= 0; i--) {
-        const b = g.bubbles[i];
-        b.y -= b.speed;
-        if (b.y < -20) g.bubbles.splice(i, 1);
-      }
-
-      if (g.frame % 100 === 0) {
-        const gapSize = Math.max(160, 220 - (g.frame / 500));
-        const gapY = 100 + Math.random() * (canvas.height - gapSize - 200);
-        g.obstacles.push({
-          x: canvas.width,
-          gapY,
-          gapSize,
-          passed: false
-        });
-      }
-
-      if (g.frame % 150 === 0) {
-         const lastObs = g.obstacles[g.obstacles.length - 1];
-         if (lastObs) {
-            g.tokens.push({
-                x: lastObs.x + 200,
-                y: 100 + Math.random() * (canvas.height - 200),
-                collected: false
-            });
-         }
-      }
-
-      for (let i = g.particles.length - 1; i >= 0; i--) {
-        const p = g.particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.03;
-        if (p.life <= 0) g.particles.splice(i, 1);
-      }
-
-      const shrimpX = 120;
-      const shrimpSize = 35;
-
-      g.obstacles = g.obstacles.filter(obs => {
-        obs.x -= g.speed;
-        if (shrimpX + shrimpSize > obs.x && shrimpX < obs.x + 60) {
-          if (g.shrimpY < obs.gapY || g.shrimpY + shrimpSize > obs.gapY + obs.gapSize) {
-             setGameState('gameover');
-             triggerParticles(shrimpX + 15, g.shrimpY + 15, '#ef4444', 30, 3);
-          }
-        }
-        if (!obs.passed && obs.x + 60 < shrimpX) {
-          obs.passed = true;
-          setScore(s => s + 1);
-        }
-        return obs.x > -100;
-      });
-
-      g.tokens = g.tokens.filter(t => {
-        t.x -= g.speed;
-        if (!t.collected) {
-          const dx = (shrimpX + 15) - t.x;
-          const dy = (g.shrimpY + 15) - t.y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist < 40) {
-            t.collected = true;
-            setCoins(c => c + 1);
-            triggerParticles(t.x, t.y, '#fbbf24', 10, 1.5);
-          }
-        }
-        return t.x > -100 && !t.collected;
-      });
-    };
-
-    const draw = () => {
-      const g = gameRef.current;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      bgGrad.addColorStop(0, '#020617');
-      bgGrad.addColorStop(0.6, '#080c25');
-      bgGrad.addColorStop(1, '#0f172a');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1;
-      g.bubbles.forEach(b => {
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-        ctx.stroke();
-      });
-
-      g.tokens.forEach(t => {
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#fbbf24';
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.arc(t.x, t.y, 14, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 16px Inter';
-        ctx.textAlign = 'center';
-        ctx.fillText('$', t.x, t.y + 6);
-      });
-
-      g.particles.forEach(p => {
-        ctx.globalAlpha = p.life;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      ctx.globalAlpha = 1.0;
-
-      g.obstacles.forEach(obs => {
-        ctx.fillStyle = '#ef4444';
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = 'rgba(239, 68, 68, 0.4)';
-        const pipeWidth = 60;
-        ctx.fillRect(obs.x, 0, pipeWidth, obs.gapY);
-        ctx.fillRect(obs.x, obs.gapY + obs.gapSize, pipeWidth, canvas.height - (obs.gapY + obs.gapSize));
-        ctx.shadowBlur = 0;
-      });
-
-      ctx.font = '64px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.save();
-      ctx.translate(120, g.shrimpY + 25);
-      const rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, g.velocity * 0.1));
-      ctx.rotate(rotation);
-      ctx.fillText('🦐', 0, 0);
-      ctx.restore();
-
-      if (stateRef.current === 'playing') {
-        animationId = requestAnimationFrame(() => {
-          update();
-          draw();
-        });
-      }
-    };
-
-    if (stateRef.current === 'playing') {
-      draw();
-    } else {
-      ctx.fillStyle = '#020617';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = '24px Space Grotesk';
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.1)';
-      ctx.textAlign = 'center';
-      ctx.fillText('FLAPPY KRILL UNIVERSE', canvas.width/2, canvas.height/2);
-    }
-
-    return () => cancelAnimationFrame(animationId);
-  }, [gameState]);
-
-  useEffect(() => {
-    if (score > highScore) setHighScore(score);
-  }, [score, highScore]);
-
-  return (
-    <div 
-      ref={containerRef}
-      className="relative w-full max-w-6xl mx-auto rounded-3xl md:rounded-[3rem] overflow-hidden border-4 md:border-8 border-sky-500/20 bg-slate-950 shadow-[0_0_80px_rgba(56,189,248,0.2)] group aspect-[1200/750] h-auto select-none touch-none" 
-      onMouseDown={jump}
-      onTouchStart={jump}
-    >
-      {/* Optimized HUD for Mobile: Slimmer strip at the top */}
-      <div className="absolute top-0 left-0 right-0 p-2 md:p-10 flex justify-between items-center z-20 pointer-events-none select-none">
-        <div className="flex gap-2 md:gap-8 items-center">
-          <div className="px-2 py-1 md:px-8 md:py-4 bg-slate-900/80 backdrop-blur-md rounded-lg md:rounded-3xl border border-sky-500/20 shadow-xl flex items-center gap-2 md:block">
-            <div className="flex items-center gap-1 md:gap-3 md:mb-1">
-              <TrendingUp size={10} className="text-sky-400" />
-              <span className="text-[6px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">Score</span>
-            </div>
-            <span className="text-white font-black text-xs md:text-4xl italic leading-none">{score}</span>
-          </div>
-          <div className="px-2 py-1 md:px-8 md:py-4 bg-slate-900/80 backdrop-blur-md rounded-lg md:rounded-3xl border border-yellow-500/20 shadow-xl flex items-center gap-2 md:block">
-            <div className="flex items-center gap-1 md:gap-3 md:mb-1">
-              <Coins size={10} className="text-yellow-400" />
-              <span className="text-[6px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">Krill</span>
-            </div>
-            <span className="text-yellow-400 font-black text-xs md:text-4xl italic leading-none">{coins}</span>
-          </div>
-        </div>
-        
-        <div className="px-2 py-1 md:px-8 md:py-4 bg-slate-900/80 backdrop-blur-md rounded-lg md:rounded-3xl border border-white/10 shadow-xl flex items-center gap-2 md:block">
-          <div className="flex items-center gap-1 md:gap-3 md:mb-1">
-            <Trophy size={10} className="text-slate-500" />
-            <span className="text-[6px] md:text-[11px] text-slate-400 uppercase font-black tracking-tight md:tracking-[0.2em]">High</span>
-          </div>
-          <span className="text-white/70 font-black text-xs md:text-4xl italic leading-none">{highScore}</span>
-        </div>
-      </div>
-
-      <canvas 
-        ref={canvasRef} 
-        width={1200} 
-        height={750} 
-        className="w-full h-full block cursor-pointer select-none object-contain"
-      />
-      
-      {gameState === 'idle' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-3xl transition-all z-30 p-4 md:p-16 text-center">
-          <div className="relative mb-4 md:mb-12">
-            <div className="absolute inset-0 bg-sky-500/30 blur-[40px] md:blur-[100px] rounded-full scale-150 animate-pulse"></div>
-            <div className="w-16 h-16 md:w-48 md:h-48 bg-sky-900/30 rounded-full flex items-center justify-center border-2 md:border-4 border-sky-400/50 relative shadow-2xl">
-              <span className="text-3xl md:text-9xl">🦐</span>
-            </div>
-          </div>
-          
-          <h3 className="text-2xl md:text-8xl font-black text-white mb-2 md:mb-6 uppercase tracking-tighter italic scale-110 electric-glow">RUG ESCAPE</h3>
-          <p className="text-sky-400 font-bold uppercase tracking-widest text-[8px] md:text-lg mb-4 md:mb-12 px-4">Swim through the crash • Rebuild the community</p>
-          
-          <div className="bg-slate-900/80 p-3 md:p-8 rounded-xl md:rounded-[2rem] border border-white/10 mb-6 md:mb-14 max-w-xs md:max-w-lg">
-            <div className="flex items-center justify-center gap-3 md:gap-10">
-               <div className="flex flex-col items-center gap-1 md:gap-3">
-                  <div className="w-8 h-8 md:w-16 md:h-16 bg-white/10 rounded-lg md:rounded-2xl flex items-center justify-center border border-white/20 text-white shadow-lg">
-                     <ChevronUp size={16} className="md:hidden" />
-                     <ChevronUp size={32} className="hidden md:block" />
-                  </div>
-                  <span className="text-[6px] md:text-xs text-white font-black uppercase tracking-widest">Tap</span>
-               </div>
-               <div className="w-px h-8 md:h-16 bg-white/10"></div>
-               <div className="text-left">
-                  <p className="text-white font-black text-[8px] md:text-sm uppercase mb-1 leading-none">FLAP TO SURVIVE</p>
-                  <p className="text-slate-500 text-[6px] md:text-[10px] font-bold uppercase tracking-widest leading-none mt-1">Dodge the red candles</p>
-               </div>
-            </div>
-          </div>
-
-          <button className="group relative px-8 py-3 md:px-24 md:py-8 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-lg md:rounded-[2rem] transition-all shadow-[0_0_60px_rgba(2,132,199,0.6)] active:scale-95 text-sm md:text-4xl tracking-tighter italic">
-             START SWIMMING
-          </button>
-        </div>
-      )}
-
-      {gameState === 'gameover' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/95 backdrop-blur-3xl animate-in fade-in zoom-in duration-300 z-30 p-4 md:p-16 text-center overflow-hidden">
-          <div className="text-4xl md:text-[12rem] mb-2 md:mb-10 drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]">💀</div>
-          <h3 className="text-2xl md:text-9xl font-black text-white mb-2 md:mb-6 uppercase tracking-tighter italic drop-shadow-2xl">REKT!</h3>
-          <p className="text-red-400 font-black tracking-widest uppercase mb-4 md:mb-16 text-[8px] md:text-2xl leading-none">The market was too volatile.</p>
-          
-          <div className="grid grid-cols-2 gap-3 md:gap-12 mb-6 md:mb-20 w-full max-w-sm md:max-w-4xl px-4">
-            <div className="text-center p-3 md:p-10 bg-slate-950/70 rounded-xl md:rounded-[3rem] border border-white/15 shadow-2xl flex flex-col items-center justify-center min-h-[60px] md:min-h-[auto]">
-              <p className="text-slate-500 text-[6px] md:text-xs uppercase font-black tracking-tight md:tracking-[0.3em] mb-1 md:mb-4 leading-none">Dodged</p>
-              <p className="text-white text-xl md:text-8xl font-black leading-none">{score}</p>
-            </div>
-            <div className="text-center p-3 md:p-10 bg-slate-950/70 rounded-xl md:rounded-[3rem] border border-white/15 shadow-2xl flex flex-col items-center justify-center min-h-[60px] md:min-h-[auto]">
-              <p className="text-slate-500 text-[6px] md:text-xs uppercase font-black tracking-tight md:tracking-[0.3em] mb-1 md:mb-4 leading-none">Banked</p>
-              <p className="text-yellow-400 text-xl md:text-8xl font-black leading-none">{coins}</p>
-            </div>
-          </div>
-
-          <button 
-            onClick={(e) => { e.stopPropagation(); startGame(); }} 
-            className="group flex items-center gap-2 md:gap-8 px-6 py-3 md:px-20 md:py-8 bg-white text-red-600 font-black rounded-lg md:rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-2xl text-xs md:text-3xl uppercase tracking-tighter"
-          >
-            <RefreshCcw size={16} className="md:hidden" />
-            <RefreshCcw size={40} className="hidden md:block group-hover:rotate-180 transition-transform duration-1000" />
-            RESPAWN
-          </button>
-        </div>
-      )}
-
-      <div className="absolute bottom-2 md:bottom-12 left-1/2 -translate-x-1/2 pointer-events-none z-20 opacity-40 group-hover:opacity-100 transition-opacity">
-        <div className="flex gap-2 md:gap-8 items-center bg-slate-900/95 px-4 py-1 md:px-12 md:py-4 rounded-full border border-white/15 shadow-2xl backdrop-blur-3xl">
-          <span className="text-[6px] md:text-sm text-sky-400 uppercase font-black tracking-tight md:tracking-[0.4em]">Tap to Swim</span>
-          <div className="w-1 h-1 md:w-3 md:h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_20px_#22c55e]"></div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const App: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -463,372 +49,341 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-950 text-slate-200">
-      <div className="fixed inset-0 bg-grid pointer-events-none z-0"></div>
-      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none"></div>
+    <div className="min-h-screen relative overflow-hidden bg-[#0c0905] text-[#f5e6c8]">
+      {/* Revised Background: Richer Pattern & Vignette */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.07]" style={{
+         backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h2v2h-2V0zm2 2h2v2h-2V2zm2 2h2v2h-2V4zm2 2h2v2h-2V6zM0 40h2v2H0v-2zm2 2h2v2H2v-2zm2 2h2v2H4v-2zm2 2h2v2H6v-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
+      <div className="fixed inset-0 bg-radial-gradient from-transparent via-[#1a120b]/80 to-[#000000] z-0 pointer-events-none"></div>
+      
+      {/* Decorative Border Frames */}
+      <div className="fixed top-4 bottom-4 left-4 right-4 border border-[#d4af37]/10 pointer-events-none z-50 lg:block hidden"></div>
+      <div className="fixed top-0 left-0 w-full h-2 bg-gradient-to-r from-[#1a120b] via-[#d4af37]/50 to-[#1a120b] z-50"></div>
 
-      <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-sky-900/30">
+      <nav className="fixed top-0 w-full z-50 bg-[#1a120b]/90 backdrop-blur-xl border-b border-[#d4af37]/30 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
-              <img src={LOGO_URL} alt="The Krill Logo" className="w-12 h-12 rounded-full border border-sky-400/50 shadow-[0_0_15px_rgba(56,189,248,0.3)]" />
-              <span className="font-display text-2xl font-bold tracking-tighter electric-glow text-white uppercase">THE KRILL</span>
+          <div className="flex justify-between items-center h-24">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#d4af37] blur-lg opacity-20 rounded-full"></div>
+                <img src={LOGO_URL} alt="42069 Logo" className="relative w-12 h-12 rounded-full border border-[#d4af37] shadow-lg" />
+              </div>
+              <span className="font-greek text-2xl font-bold tracking-[0.2em] text-[#d4af37] drop-shadow-md">42069</span>
             </div>
 
-            <div className="hidden md:flex items-center gap-8 font-medium">
-              <a href="#about" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">About</a>
-              <a href="#arcade" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">Arcade</a>
-              <a href="#memes" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">Memes</a>
-              <a href="#how-to-buy" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">How to Buy</a>
-              <a href="#chart" className="hover:text-sky-400 transition-colors text-sm uppercase tracking-widest font-bold">Live Chart</a>
+            <div className="hidden md:flex items-center gap-8 font-serif">
+              <a href="#about" className="hover:text-[#d4af37] transition-colors text-base uppercase tracking-[0.2em] font-bold">Legend</a>
+              <a href="#how-to-buy" className="hover:text-[#d4af37] transition-colors text-base uppercase tracking-[0.2em] font-bold">Acquire</a>
+              <a href="#chart" className="hover:text-[#d4af37] transition-colors text-base uppercase tracking-[0.2em] font-bold">Oracle</a>
               <a 
                 href={X_COMMUNITY_URL} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center gap-2 px-6 py-2 bg-sky-600 hover:bg-sky-500 rounded-full text-white transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(2,132,199,0.4)]"
+                className="flex items-center gap-2 px-6 py-2 bg-[#d4af37]/5 hover:bg-[#d4af37]/10 border border-[#d4af37]/40 rounded-sm text-[#d4af37] transition-all hover:shadow-[0_0_15px_rgba(212,175,55,0.2)]"
               >
-                <XLogo size={18} />
-                <span className="text-sm font-bold">Community</span>
+                <XLogo size={16} />
+                <span className="text-xs font-bold uppercase tracking-widest">Olympus</span>
               </a>
             </div>
 
-            <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className="md:hidden text-[#d4af37]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <CloseIcon size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden bg-slate-900 border-b border-sky-900/50 p-4 space-y-4 animate-in slide-in-from-top duration-300">
-            <a href="#about" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>About</a>
-            <a href="#arcade" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Arcade</a>
-            <a href="#memes" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Memes</a>
-            <a href="#how-to-buy" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>How to Buy</a>
-            <a href="#chart" className="block text-lg py-2 font-bold uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Live Chart</a>
-            <a href={X_COMMUNITY_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sky-400 py-2 font-bold uppercase tracking-widest">
-              <XLogo size={20} /> Community
+          <div className="md:hidden bg-[#1a120b] border-b border-[#d4af37] p-6 space-y-6 animate-in slide-in-from-top duration-300 shadow-2xl">
+            <a href="#about" className="block text-xl font-greek text-[#d4af37] uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Legend</a>
+            <a href="#how-to-buy" className="block text-xl font-greek text-[#d4af37] uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Acquire</a>
+            <a href="#chart" className="block text-xl font-greek text-[#d4af37] uppercase tracking-widest" onClick={() => setIsMenuOpen(false)}>Oracle</a>
+            <a href={X_COMMUNITY_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#d4af37] py-2 font-bold uppercase tracking-widest border-t border-[#d4af37]/20 mt-4 pt-6">
+              <XLogo size={20} /> Olympus
             </a>
           </div>
         )}
       </nav>
 
-      <main className="relative z-10">
-        <section className="pt-32 pb-20 px-4">
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
-            <div className="flex-1 text-center lg:text-left space-y-8">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-sky-950 border border-sky-500/30 text-sky-400 text-sm font-bold tracking-widest uppercase mb-4">
-                Born from the Depths • {TICKER}
+      <main className="relative z-10 pt-24">
+        {/* REVISED HERO SECTION */}
+        <section className="min-h-[90vh] flex items-center py-20 px-4 md:px-8 relative overflow-hidden">
+          {/* Subtle Glows */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#d4af37]/10 blur-[120px] rounded-full pointer-events-none"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-amber-900/10 blur-[150px] rounded-full pointer-events-none"></div>
+
+          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 items-center">
+            
+            {/* Left Content */}
+            <div className="order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8">
+              <div className="inline-flex items-center gap-3 px-4 py-2 border border-[#d4af37]/30 bg-[#1a120b]/50 backdrop-blur-sm rounded-full">
+                 <div className="w-2 h-2 bg-[#d4af37] rotate-45"></div>
+                 <span className="text-[#d4af37] font-greek text-xs md:text-sm tracking-[0.3em] uppercase font-bold">The Divine Integers</span>
+                 <div className="w-2 h-2 bg-[#d4af37] rotate-45"></div>
               </div>
-              <h1 className="text-6xl lg:text-8xl font-black tracking-tighter leading-none text-white">
-                WE ARE <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600">THE KRILL</span>
+              
+              <h1 className="text-7xl md:text-[7rem] lg:text-[9rem] leading-[0.9] font-greek font-black tracking-tighter text-[#f5e6c8] gold-glow relative z-10">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6c8] to-[#9a8c7d]">{TICKER.replace('$', '')}</span>
+                <span className="text-4xl md:text-6xl text-[#d4af37] absolute -top-4 -right-8 lg:-right-12">$</span>
               </h1>
-              <p className="text-xl text-slate-400 max-w-2xl mx-auto lg:mx-0">
-                A community that refused to be silenced. When one leader walked away, a thousand krill rose to take his place. Accountability matters.
+              
+              <p className="text-xl md:text-2xl text-[#d4af37]/80 font-serif italic max-w-xl leading-relaxed">
+                "Not merely a number, but a signal from the Architect himself."
               </p>
 
-              <div className="p-1 rounded-2xl bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-700 max-w-xl mx-auto lg:mx-0">
-                <div className="bg-slate-900 rounded-xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex flex-col items-start overflow-hidden w-full">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Contract Address</span>
-                    <code className="text-sky-400 font-mono text-sm break-all truncate w-full">{CONTRACT_ADDRESS}</code>
-                  </div>
+              <div className="w-full max-w-md bg-[#1a120b] border border-[#d4af37]/40 p-1 shadow-2xl relative group">
+                <div className="absolute inset-0 bg-[#d4af37]/5 group-hover:bg-[#d4af37]/10 transition-colors"></div>
+                <div className="relative flex items-center justify-between px-4 py-3 bg-[#0c0905]">
+                  <code className="text-[#d4af37] font-mono text-xs md:text-sm truncate mr-4">{CONTRACT_ADDRESS}</code>
                   <button 
                     onClick={copyToClipboard}
-                    className="flex-shrink-0 flex items-center gap-2 bg-sky-600/20 hover:bg-sky-600/40 text-sky-400 px-4 py-2 rounded-lg transition-all border border-sky-500/30 active:scale-95"
+                    className="p-2 hover:bg-[#d4af37]/20 rounded-sm transition-colors text-[#f5e6c8]"
                   >
-                    {copied ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
-                    {copied ? 'Copied!' : 'Copy'}
+                    {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                <a href="#how-to-buy" className="px-8 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-sky-400 hover:text-white transition-all flex items-center gap-2 shadow-xl shadow-sky-500/20">
-                  <Rocket size={20} />
-                  Buy $KRILL
+              <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md pt-4">
+                <a href="#how-to-buy" className="flex-1 px-8 py-4 bg-[#d4af37] hover:bg-[#b5952f] text-[#0c0905] font-greek font-bold text-lg text-center transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-105 uppercase tracking-widest relative overflow-hidden group">
+                  <span className="relative z-10 flex items-center justify-center gap-2"><Rocket size={20} /> Acquire</span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </a>
-                <a href="#chart" className="px-8 py-4 border border-sky-500/30 bg-sky-500/5 text-sky-400 font-bold rounded-xl hover:bg-sky-500/10 transition-all flex items-center gap-2">
+                <a href="#chart" className="flex-1 px-8 py-4 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37]/10 font-greek font-bold text-lg text-center transition-all flex items-center justify-center gap-2 uppercase tracking-widest">
                   <TrendingUp size={20} />
-                  View Chart
+                  Oracle
                 </a>
               </div>
             </div>
 
-            <div className="flex-1 relative animate-float">
-              <div className="absolute inset-0 bg-sky-500/20 rounded-full blur-[80px]"></div>
-              <img 
-                src={LOGO_URL} 
-                alt="Krill Hero" 
-                className="relative z-10 w-full max-w-lg mx-auto rounded-3xl shadow-2xl shadow-sky-500/30 border border-sky-400/20 rotate-3"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-[#0084cc] py-20 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-15 pointer-events-none" style={{
-            backgroundImage: 'radial-gradient(circle, #fff 1.5px, transparent 0)',
-            backgroundSize: '16px 16px'
-          }}></div>
-          <div className="max-w-7xl mx-auto px-4 text-center relative z-10 flex flex-col items-center gap-6">
-            <div className="mb-4">
-              <svg 
-                viewBox="0 0 24 24" 
-                className="w-16 h-16 text-white/90" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="M12 8v4" />
-                <path d="M12 16h.01" />
-              </svg>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-tight">
-              ACCOUNTABILITY MATTERS IN THIS SPACE.
-            </h2>
-            <p className="text-white/90 font-medium text-lg md:text-xl max-w-3xl leading-relaxed">
-              Integrity isn't optional. When the creator turned his back on 1,000+ holders, we stepped up. The Krill is now community-owned and community-driven.
-            </p>
-          </div>
-        </section>
-
-        <section id="about" className="py-24 px-4 bg-slate-950">
-          <div className="max-w-5xl mx-auto space-y-16">
-            <div className="relative group overflow-hidden rounded-3xl border border-sky-500/20 shadow-2xl">
-              <img 
-                src={ABOUT_HERO_IMAGE} 
-                alt="Krill Community Banner" 
-                className="w-full h-auto transform group-hover:scale-105 transition-transform duration-700" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-            </div>
-
-            <div className="card-gradient p-8 md:p-12 rounded-3xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-3xl rounded-full"></div>
-              <h2 className="text-4xl font-black mb-8 electric-glow text-white uppercase tracking-tighter italic">The swarm stands tall</h2>
-              <div className="space-y-6 text-slate-300 text-lg leading-relaxed">
-                <p>
-                  In the wild world of Solana, trust is a rare currency. Many are asking what truly happened with @krillxbt, the original creator who vanished into the shadows.
-                </p>
-                <p>
-                  After collecting the project's creator fees—a signal that should have guaranteed long-term commitment—he pulled a disappearing act less than five minutes after launch. In an instant, over 1,000 dedicated holders were left abandoned.
-                </p>
-                <p className="border-l-4 border-sky-500 pl-6 italic bg-sky-500/5 py-6 rounded-r-2xl">
-                  "Rather than taking responsibility or setting things right, he chose silence. Flooded with messages of concern, he simply hit delete on his x account and walked away from the community he built."
-                </p>
-                <p>
-                  Whether this was an intentional exit or a momentary failure of nerve, the consequences were real. People were hurt. But out of that chaos, something unexpected happened. The community didn't scatter. We unified.
-                </p>
-                <p className="font-bold text-white text-2xl uppercase tracking-tighter italic border-b-2 border-sky-500/30 pb-2">
-                  Accountability matters. This is the Krill Uprising.
-                </p>
-              </div>
-            </div>
-
-            <div className="relative group overflow-hidden rounded-3xl border border-sky-500/20 shadow-2xl bg-slate-900/50">
-              <img 
-                src={NARRATIVE_IMAGE} 
-                alt="Krill Narrative" 
-                className="w-full h-auto object-cover transform transition-transform duration-700" 
-              />
-              <div className="p-8 md:p-12 text-center">
-                <p className="text-xl md:text-3xl font-black text-white italic leading-relaxed tracking-tight">
-                  "The krill, a narrative tied to the white whale which is at 23M marketcap on the moment of writing this. I like the idea of the krill even more."
-                </p>
-                <div className="h-1 w-24 bg-sky-500 mx-auto mt-8 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="arcade" className="py-32 px-4 bg-slate-900/50 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto relative z-10 text-center">
-            <div className="mb-20">
-              <div className="inline-flex items-center gap-2 px-6 py-2 bg-sky-500/10 border border-sky-500/30 rounded-full text-sky-400 text-xs font-black tracking-[0.4em] uppercase mb-8 shadow-xl">
-                Arcade Sector Alpha
-              </div>
-              <h2 className="text-5xl md:text-8xl font-black text-white mb-8 italic tracking-tighter uppercase drop-shadow-2xl electric-glow">RUG ESCAPE</h2>
-              <p className="text-slate-400 max-w-3xl mx-auto text-lg md:text-2xl mb-14 leading-relaxed font-medium">The market is crashing. The pipes are red. The swarm is your only hope. Tap to stay afloat in the deep ocean of volatility.</p>
-              
-              <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-16 text-[10px] md:text-sm uppercase font-black tracking-[0.2em] text-sky-400/80">
-                <span className="flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-slate-900/60 rounded-2xl border border-sky-400/30 shadow-2xl transition-all hover:bg-sky-900/80">
-                  <div className="w-2 h-2 md:w-3 md:h-3 bg-sky-400 rounded-full animate-ping"></div>
-                  Snappy Flap Controls
-                </span>
-                <span className="flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-slate-900/60 rounded-2xl border border-sky-400/30 shadow-2xl transition-all hover:bg-sky-900/80">
-                  <div className="w-2 h-2 md:w-3 md:h-3 bg-yellow-400 rounded-full"></div>
-                  Stack $KRILL Bonus
-                </span>
-              </div>
-            </div>
-            
-            <KrillGame />
-          </div>
-        </section>
-
-        <section id="memes" className="py-24 px-4 bg-slate-900/30">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <div className="flex justify-center items-center gap-3 mb-4">
-                <ImageIcon className="text-sky-400" size={32} />
-                <h2 className="text-5xl font-black text-white uppercase tracking-tighter">Krill Army Memes</h2>
-              </div>
-              <p className="text-slate-400 text-xl font-medium">The collective creativity of the most resilient swarm in crypto.</p>
-              <div className="h-1.5 w-32 bg-sky-500 mx-auto rounded-full mt-6"></div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {MEME_IMAGES.map((src, index) => (
-                <div key={index} className="group relative aspect-square overflow-hidden rounded-2xl border border-sky-500/20 shadow-lg hover:shadow-sky-500/20 transition-all duration-500 bg-slate-800">
-                  <img 
-                    src={src} 
-                    alt={`Krill Meme ${index + 1}`} 
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-sky-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="px-4 py-2 bg-slate-950/80 rounded-full text-sky-400 font-bold text-sm tracking-widest border border-sky-400/50">
-                      $KRILL ARMY
-                    </span>
-                  </div>
+            {/* Right Visual */}
+            <div className="order-1 lg:order-2 flex justify-center lg:justify-end relative">
+              <div className="relative w-72 h-72 md:w-[500px] md:h-[500px]">
+                {/* Rotating Rings */}
+                <div className="absolute inset-0 border border-[#d4af37]/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+                <div className="absolute inset-4 border border-[#d4af37]/20 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+                <div className="absolute inset-0 bg-[#d4af37]/10 blur-[80px] rounded-full animate-pulse"></div>
+                
+                <img 
+                  src={LOGO_URL} 
+                  alt="42069 Emblem" 
+                  className="absolute inset-4 md:inset-8 w-[calc(100%-2rem)] h-[calc(100%-2rem)] md:w-[calc(100%-4rem)] md:h-[calc(100%-4rem)] object-cover rounded-full border-2 border-[#d4af37]/60 shadow-2xl"
+                />
+                
+                {/* Floating Elements */}
+                <div className="absolute -top-4 -right-4 bg-[#1a120b] border border-[#d4af37] px-4 py-2 rounded-sm shadow-xl animate-bounce">
+                   <span className="font-mono text-[#d4af37] text-xs">420</span>
                 </div>
-              ))}
+                <div className="absolute -bottom-4 -left-4 bg-[#1a120b] border border-[#d4af37] px-4 py-2 rounded-sm shadow-xl animate-bounce" style={{animationDelay: '0.5s'}}>
+                   <span className="font-mono text-[#d4af37] text-xs">69</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <div className="h-24 w-full bg-gradient-to-b from-transparent to-[#2c1e16]"></div>
+
+        {/* ABOUT SECTION */}
+        <section id="about" className="py-24 px-4 bg-[#2c1e16] relative stone-texture overflow-hidden">
+          {/* Decorative Corner */}
+          <div className="absolute top-0 left-0 w-32 h-32 border-t-4 border-l-4 border-[#d4af37]/20"></div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 border-b-4 border-r-4 border-[#d4af37]/20"></div>
+
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20 relative z-10">
+              <h2 className="text-5xl md:text-6xl font-greek text-[#d4af37] mb-6 gold-glow uppercase tracking-tighter">The Prophecy</h2>
+              <div className="flex items-center justify-center gap-4">
+                 <div className="h-[1px] w-20 bg-gradient-to-r from-transparent to-[#d4af37]"></div>
+                 <div className="w-3 h-3 bg-[#d4af37] rotate-45"></div>
+                 <div className="h-[1px] w-20 bg-gradient-to-l from-transparent to-[#d4af37]"></div>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-16 items-start relative z-10">
+              {/* Scattered Images Visual */}
+              <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
+                {SCATTER_IMAGES.map((img, idx) => (
+                   <div 
+                      key={idx}
+                      className="absolute w-56 transition-all duration-500 hover:scale-110 hover:z-50 shadow-2xl border-4 border-white/5"
+                      style={{
+                        top: `${10 + (idx * 15)}%`,
+                        left: `${(idx % 2 === 0 ? 5 : 40) + (Math.random() * 10)}%`,
+                        transform: `rotate(${Math.random() * 20 - 10}deg) translateZ(${idx * 10}px)`,
+                        zIndex: idx
+                      }}
+                   >
+                      <img src={img} alt={`Evidence ${idx}`} className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500" />
+                   </div>
+                ))}
+              </div>
+
+              {/* Mobile Image Stack (Carousel-ish) */}
+              <div className="lg:hidden flex overflow-x-auto gap-4 pb-8 snap-x">
+                 {SCATTER_IMAGES.map((img, idx) => (
+                    <img key={idx} src={img} alt="Evidence" className="w-64 h-auto flex-shrink-0 rounded-lg border-2 border-[#d4af37]/30 snap-center" />
+                 ))}
+              </div>
+
+              <div className="space-y-10">
+                 <div className="bg-[#1a120b]/80 p-8 border border-[#d4af37]/20 shadow-2xl backdrop-blur-sm relative">
+                    <div className="absolute -top-3 -left-3 text-[#d4af37] text-6xl opacity-20 font-serif">"</div>
+                    <div className="space-y-6 text-lg leading-loose font-serif text-[#eaddcf] text-justify relative z-10">
+                      <p>
+                        <span className="text-[#d4af37] font-greek text-2xl font-bold">This {TICKER}</span> is <span className="font-bold text-[#d4af37]">@elonmusk's</span> favorite number.
+                      </p>
+                      <p>
+                        Elon Musk has repeatedly used <span className="text-[#d4af37] font-bold">420</span> and <span className="text-[#d4af37] font-bold">69</span> individually in public ways, which has turned the combination into an ongoing internet joke.
+                      </p>
+                      <p>
+                        It is not merely a meme; it is a cultural artifact, etched into the digital stone of the modern agora. When the signs align, the market responds.
+                      </p>
+                    </div>
+                 </div>
+
+                 <div className="meander-border bg-[#1a120b] p-2 shadow-2xl mt-8 transform hover:scale-[1.02] transition-transform duration-500">
+                    <img 
+                      src={IMAGE_BANNER} 
+                      alt="42069 Banner" 
+                      className="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity"
+                    />
+                    <div className="text-center pt-2 pb-1">
+                       <span className="text-[#d4af37] font-greek text-xs tracking-[0.4em] uppercase">The Banner of Truth</span>
+                    </div>
+                  </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="how-to-buy" className="py-24 px-4 relative">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl font-black text-white mb-4 uppercase italic tracking-tighter">HOW TO BUY ON PUMP.FUN</h2>
-              <div className="h-1.5 w-32 bg-sky-500 mx-auto rounded-full"></div>
+        <div className="h-24 w-full bg-gradient-to-t from-transparent to-[#2c1e16]"></div>
+
+        {/* HOW TO BUY */}
+        <section id="how-to-buy" className="py-24 px-4 bg-[#0c0905] relative">
+           {/* Background Pillars */}
+           <div className="absolute left-[10%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#d4af37]/20 to-transparent"></div>
+           <div className="absolute right-[10%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#d4af37]/20 to-transparent"></div>
+
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl font-greek text-[#d4af37] mb-6 gold-glow uppercase tracking-tighter">The Path to Ascension</h2>
+              <p className="text-[#8c7b70] font-serif italic text-xl">Follow the steps to enlightenment.</p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
-                  step: "01",
-                  title: "Setup Wallet",
-                  desc: "Download Phantom or Solflare wallet from the app store or as a browser extension.",
-                  icon: <Wallet className="text-sky-400" size={32} />
+                  step: "I",
+                  title: "Create Wallet",
+                  desc: "Forge your digital vault with Phantom or Solflare.",
+                  icon: <Wallet className="text-[#d4af37]" size={32} />
                 },
                 {
-                  step: "02",
-                  title: "Get SOL",
-                  desc: "Buy SOL on an exchange like Coinbase or Binance and send it to your wallet address.",
-                  icon: <TrendingUp className="text-sky-400" size={32} />
+                  step: "II",
+                  title: "Gather SOL",
+                  desc: "Acquire the native token of Solana from the exchanges.",
+                  icon: <TrendingUp className="text-[#d4af37]" size={32} />
                 },
                 {
-                  step: "03",
-                  title: "Find The Krill",
-                  desc: "Head over to Pump.fun and paste our contract address in the search bar.",
-                  icon: <ExternalLink className="text-sky-400" size={32} />
+                  step: "III",
+                  title: "Seek 42069",
+                  desc: "Journey to Pump.fun and enter the sacred contract.",
+                  icon: <ExternalLink className="text-[#d4af37]" size={32} />
                 },
                 {
-                  step: "04",
-                  title: "Swap for $KRILL",
-                  desc: "Connect your wallet, enter the amount of SOL you want to spend, and hit buy!",
-                  icon: <Rocket className="text-sky-400" size={32} />
+                  step: "IV",
+                  title: "Transmute",
+                  desc: "Swap your SOL for the divine $42069.",
+                  icon: <Rocket className="text-[#d4af37]" size={32} />
                 }
               ].map((item, idx) => (
-                <div key={idx} className="card-gradient p-8 rounded-3xl hover:border-sky-400/50 transition-all group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-sky-500/10 rounded-2xl group-hover:scale-110 transition-transform">
-                      {item.icon}
-                    </div>
-                    <span className="text-4xl font-black text-slate-800">{item.step}</span>
+                <div key={idx} className="relative group bg-[#1a120b] border border-[#d4af37]/20 p-8 hover:bg-[#201610] hover:border-[#d4af37]/60 transition-all duration-500 flex flex-col items-center text-center">
+                  <div className="absolute inset-x-0 bottom-0 h-1 bg-[#d4af37] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
+                  
+                  <div className="w-16 h-16 bg-[#d4af37]/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform border border-[#d4af37]/30">
+                    {item.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                  
+                  <span className="text-4xl font-greek text-[#d4af37]/10 font-bold absolute top-4 right-6 pointer-events-none">{item.step}</span>
+                  
+                  <h3 className="text-xl font-greek font-bold text-[#f5e6c8] mb-4 uppercase tracking-wider">{item.title}</h3>
+                  <p className="text-[#d4af37]/60 font-serif leading-relaxed text-sm">{item.desc}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-12 text-center">
+            <div className="mt-20 text-center">
               <a 
                 href={`https://pump.fun/coin/${CONTRACT_ADDRESS}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black text-xl rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-sky-500/40"
+                className="inline-flex items-center gap-4 px-16 py-6 bg-gradient-to-r from-[#b5952f] to-[#d4af37] text-[#0c0905] font-greek font-black text-2xl hover:scale-105 transition-all shadow-[0_0_40px_rgba(212,175,55,0.4)] uppercase tracking-[0.2em] border-2 border-[#f5e6c8] relative overflow-hidden"
               >
-                GO TO PUMP.FUN
-                <ExternalLink size={24} />
+                <span className="relative z-10 flex items-center gap-3">Enter Pump.fun <ExternalLink size={28} /></span>
+                <div className="absolute inset-0 bg-white/30 mix-blend-overlay hover:opacity-100 opacity-0 transition-opacity"></div>
               </a>
             </div>
           </div>
         </section>
 
-        <section id="chart" className="py-24 px-4 bg-slate-900/50">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row items-end justify-between mb-8 gap-4">
+        {/* CHART SECTION */}
+        <section id="chart" className="py-24 px-4 bg-[#2c1e16] stone-texture border-y border-[#d4af37]/40 relative">
+          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
               <div>
-                <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter">LIVE MARKET DATA</h2>
-                <p className="text-slate-400 uppercase tracking-[0.2em] text-xs font-bold">Resilience in the metrics</p>
+                <h2 className="text-5xl font-greek text-[#d4af37] uppercase gold-glow tracking-tighter">The Oracle</h2>
+                <p className="text-[#f5e6c8]/60 font-serif italic mt-2 text-lg">Observe the candles of fate.</p>
               </div>
-              <div className="flex gap-4">
-                <div className="bg-slate-800 px-6 py-3 rounded-2xl border border-slate-700 shadow-2xl">
-                  <span className="text-slate-500 text-xs block uppercase font-black leading-tight tracking-widest">Ticker</span>
-                  <span className="text-sky-400 font-black tracking-[0.2em]">{TICKER}</span>
-                </div>
+              <div className="px-8 py-3 border-2 border-[#d4af37] bg-[#1a120b] shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                <span className="text-[#d4af37] font-greek font-bold tracking-[0.3em] text-xl">{TICKER}</span>
               </div>
             </div>
 
-            <div className="h-[600px] md:h-auto md:aspect-[16/9] w-full rounded-3xl md:rounded-[3rem] overflow-hidden border border-sky-500/20 shadow-2xl bg-slate-900 ring-4 md:ring-8 ring-sky-500/5">
+            <div className="h-[700px] w-full bg-[#1a120b] border-[8px] border-[#2c1e16] ring-1 ring-[#d4af37]/50 shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 left-0 right-0 h-1 bg-[#d4af37] z-20"></div>
+              <div className="absolute inset-0 flex items-center justify-center text-[#d4af37]/20 font-greek text-4xl uppercase pointer-events-none">
+                Connecting to Olympus...
+              </div>
               <iframe 
                 src={`https://dexscreener.com/solana/${CONTRACT_ADDRESS}?embed=1&theme=dark&trades=0&info=0`} 
-                className="w-full h-full"
-                title="The Krill Dexscreener Chart"
+                className="w-full h-full relative z-10"
+                title="42069 Chart"
               ></iframe>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="py-20 border-t border-sky-900/30 px-4 relative z-10 bg-slate-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-16 mb-16">
-            <div className="flex flex-col items-center md:items-start gap-6">
-              <div className="flex items-center gap-3">
-                <img src={LOGO_URL} alt="The Krill Logo" className="w-16 h-16 rounded-full border-2 border-sky-400/30 shadow-2xl" />
-                <span className="font-display text-3xl font-bold electric-glow text-white uppercase tracking-tighter">THE KRILL</span>
-              </div>
-              <p className="text-slate-500 text-lg max-w-sm text-center md:text-left leading-relaxed font-medium italic">
-                The swarm is the strength. Accountability is the mission. Solana's deepest resilience.
-              </p>
-            </div>
-            
-            <div className="flex flex-col items-center md:items-end gap-10">
-               <div className="flex gap-10 items-center">
-                <a href={`mailto:${CONTACT_EMAIL}`} className="text-slate-400 hover:text-sky-400 transition-all hover:scale-125 p-3 rounded-full bg-slate-900 border border-slate-800 shadow-xl flex items-center gap-3">
-                  <Mail size={32} />
-                  <span className="hidden md:inline text-xs font-black uppercase tracking-widest">{CONTACT_EMAIL}</span>
-                </a>
-                <a href={X_COMMUNITY_URL} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-sky-400 transition-all hover:scale-125 p-3 rounded-full bg-slate-900 border border-slate-800 shadow-xl">
-                  <XLogo size={32} />
-                </a>
-                <a href={`https://dexscreener.com/solana/${CONTRACT_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-sky-400 transition-all hover:scale-125 p-3 rounded-full bg-slate-900 border border-slate-800 shadow-xl">
-                  <TrendingUp size={32} />
-                </a>
-              </div>
-              <div className="flex gap-10 text-xs uppercase font-black tracking-[0.3em] text-slate-500">
-                 <a href="#about" className="hover:text-sky-400 transition-colors">About</a>
-                 <a href="#arcade" className="hover:text-sky-400 transition-colors">Arcade</a>
-                 <a href="#memes" className="hover:text-sky-400 transition-colors">Memes</a>
-                 <a href="#how-to-buy" className="hover:text-sky-400 transition-colors">Buy</a>
-              </div>
-            </div>
+      <footer className="py-20 bg-[#0c0905] border-t border-[#d4af37]/20 px-4 relative z-10">
+         {/* Footer glow */}
+         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[#d4af37]/5 blur-[100px] rounded-full pointer-events-none"></div>
+         
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="flex justify-center items-center gap-6 mb-10">
+             <div className="h-px w-20 bg-[#d4af37]/30"></div>
+            <img src={LOGO_URL} alt="Logo" className="w-20 h-20 rounded-full border-2 border-[#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.2)]" />
+            <div className="h-px w-20 bg-[#d4af37]/30"></div>
           </div>
           
-          <div className="text-center text-slate-600 text-[10px] border-t border-slate-900 pt-16">
-            <p className="mb-4 font-black uppercase tracking-[0.3em] text-slate-400">CONTACT: {CONTACT_EMAIL}</p>
-            <p className="mb-8 font-black uppercase tracking-[0.3em] text-slate-500">© 2025 THE KRILL COMMUNITY • UNIFIED BY ACCIDENT, HELD BY STRENGTH</p>
-            <p className="max-w-5xl mx-auto opacity-30 uppercase tracking-[0.1em] leading-relaxed italic">
-              LEGAL NOTICE: $KRILL IS A MEMETIC EXPRESSION OF COMMUNITY DISCONTENT AND RESILIENCE. IT HOLDS NO CONTRACTUAL VALUE, NO PROMISE OF PROFITS, AND NO FORMAL ORGANIZATION. TRADING IN VOLATILE ASSETS IS EXTREMELY RISKY. CONDUCT YOUR OWN RESEARCH AND INVEST RESPONSIBLY.
+          <span className="font-greek text-4xl font-bold text-[#d4af37] mb-12 block tracking-[0.2em] gold-glow">42069</span>
+
+          <div className="flex justify-center gap-12 mb-16">
+            <a href={X_COMMUNITY_URL} target="_blank" rel="noopener noreferrer" className="group relative p-4">
+               <div className="absolute inset-0 bg-[#d4af37] opacity-0 group-hover:opacity-10 blur-md rounded-full transition-opacity"></div>
+              <XLogo size={32} className="text-[#8c7b70] group-hover:text-[#d4af37] transition-colors" />
+            </a>
+            <a href={`https://dexscreener.com/solana/${CONTRACT_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="group relative p-4">
+               <div className="absolute inset-0 bg-[#d4af37] opacity-0 group-hover:opacity-10 blur-md rounded-full transition-opacity"></div>
+              <TrendingUp size={32} className="text-[#8c7b70] group-hover:text-[#d4af37] transition-colors" />
+            </a>
+          </div>
+
+          <div className="text-[#5c504a] text-xs space-y-4 font-serif border-t border-[#d4af37]/10 pt-10">
+            <p className="tracking-[0.3em] uppercase text-[#d4af37]/30 font-bold">© 2026 THE 42069 ORDER</p>
+            <p className="max-w-3xl mx-auto leading-relaxed opacity-60">
+              $42069 is a memetic artifact dedicated to the culture of the internet. It possesses no intrinsic value, serves no utility, and offers no financial return. It exists solely for the amusement of the digital age. Tread carefully in the realm of speculation.
             </p>
           </div>
         </div>
