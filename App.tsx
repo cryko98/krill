@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Copy, 
   Check, 
@@ -48,12 +48,47 @@ const App: React.FC = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Generate floating numbers for the background
+  const floatingNumbers = useMemo(() => {
+    return Array.from({ length: 15 }).map((_, i) => ({
+      id: i,
+      text: i % 2 === 0 ? '420' : '69',
+      left: `${Math.random() * 90 + 5}%`,
+      delay: `${Math.random() * 20}s`,
+      duration: `${Math.random() * 20 + 20}s`,
+      size: `${Math.random() * 3 + 2}rem`,
+      opacity: Math.random() * 0.08 + 0.02
+    }));
+  }, []);
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#0c0905] text-[#f5e6c8]">
       {/* Revised Background: Richer Pattern & Vignette */}
       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.07]" style={{
          backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h2v2h-2V0zm2 2h2v2h-2V2zm2 2h2v2h-2V4zm2 2h2v2h-2V6zM0 40h2v2H0v-2zm2 2h2v2H2v-2zm2 2h2v2H4v-2zm2 2h2v2H6v-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
       }}></div>
+      
+      {/* Floating Numbers Layer */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        {floatingNumbers.map((item) => (
+          <div
+            key={item.id}
+            className="absolute font-greek font-bold text-[#d4af37]"
+            style={{
+              left: item.left,
+              bottom: '-10vh',
+              fontSize: item.size,
+              opacity: item.opacity,
+              animation: `float-up ${item.duration} linear infinite`,
+              animationDelay: item.delay,
+              textShadow: '0 0 10px rgba(212, 175, 55, 0.5)'
+            }}
+          >
+            {item.text}
+          </div>
+        ))}
+      </div>
+
       <div className="fixed inset-0 bg-radial-gradient from-transparent via-[#1a120b]/80 to-[#000000] z-0 pointer-events-none"></div>
       
       {/* Decorative Border Frames */}
@@ -105,28 +140,31 @@ const App: React.FC = () => {
       </nav>
 
       <main className="relative z-10 pt-24">
-        {/* REVISED HERO SECTION */}
+        {/* ANIMATED HERO SECTION */}
         <section className="min-h-[90vh] flex items-center py-20 px-4 md:px-8 relative overflow-hidden">
-          {/* Subtle Glows */}
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#d4af37]/10 blur-[120px] rounded-full pointer-events-none"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-amber-900/10 blur-[150px] rounded-full pointer-events-none"></div>
+          {/* Animated Background Gradients */}
+          <div className="absolute inset-0 z-0">
+             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#1a120b] via-[#2c1e16] to-[#0c0905] animate-pulse" style={{animationDuration: '10s'}}></div>
+             <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-[#d4af37]/10 blur-[150px] rounded-full mix-blend-screen animate-drift"></div>
+             <div className="absolute bottom-1/4 right-1/4 w-[40rem] h-[40rem] bg-[#8B4513]/20 blur-[150px] rounded-full mix-blend-screen animate-drift" style={{animationDelay: '4s'}}></div>
+          </div>
 
-          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 items-center">
+          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 items-center relative z-10">
             
             {/* Left Content */}
             <div className="order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8">
-              <div className="inline-flex items-center gap-3 px-4 py-2 border border-[#d4af37]/30 bg-[#1a120b]/50 backdrop-blur-sm rounded-full">
-                 <div className="w-2 h-2 bg-[#d4af37] rotate-45"></div>
+              <div className="inline-flex items-center gap-3 px-4 py-2 border border-[#d4af37]/30 bg-[#1a120b]/50 backdrop-blur-sm rounded-full shadow-[0_0_15px_rgba(212,175,55,0.1)]">
+                 <div className="w-2 h-2 bg-[#d4af37] rotate-45 animate-pulse"></div>
                  <span className="text-[#d4af37] font-greek text-xs md:text-sm tracking-[0.3em] uppercase font-bold">The Divine Integers</span>
-                 <div className="w-2 h-2 bg-[#d4af37] rotate-45"></div>
+                 <div className="w-2 h-2 bg-[#d4af37] rotate-45 animate-pulse"></div>
               </div>
               
-              <h1 className="text-7xl md:text-[7rem] lg:text-[9rem] leading-[0.9] font-greek font-black tracking-tighter text-[#f5e6c8] gold-glow relative z-10">
+              <h1 className="text-7xl md:text-[7rem] lg:text-[9rem] leading-[0.9] font-greek font-black tracking-tighter text-[#f5e6c8] gold-glow relative z-10 drop-shadow-2xl">
                 <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6c8] to-[#9a8c7d]">{TICKER.replace('$', '')}</span>
                 <span className="text-4xl md:text-6xl text-[#d4af37] absolute -top-4 -right-8 lg:-right-12">$</span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-[#d4af37]/80 font-serif italic max-w-xl leading-relaxed">
+              <p className="text-xl md:text-2xl text-[#d4af37]/80 font-serif italic max-w-xl leading-relaxed drop-shadow-md">
                 "Not merely a number, but a signal from the Architect himself."
               </p>
 
@@ -201,15 +239,15 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-16 items-start relative z-10">
-              {/* Scattered Images Visual */}
-              <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
+              {/* Scattered Images Visual - UPDATED SIZES */}
+              <div className="relative h-[700px] w-full hidden lg:block perspective-1000">
                 {SCATTER_IMAGES.map((img, idx) => (
                    <div 
                       key={idx}
-                      className="absolute w-56 transition-all duration-500 hover:scale-110 hover:z-50 shadow-2xl border-4 border-white/5"
+                      className="absolute w-72 transition-all duration-500 hover:scale-110 hover:z-50 shadow-2xl border-4 border-white/5 bg-[#1a120b]"
                       style={{
-                        top: `${10 + (idx * 15)}%`,
-                        left: `${(idx % 2 === 0 ? 5 : 40) + (Math.random() * 10)}%`,
+                        top: `${5 + (idx * 12)}%`,
+                        left: `${(idx % 2 === 0 ? 0 : 35) + (Math.random() * 10)}%`,
                         transform: `rotate(${Math.random() * 20 - 10}deg) translateZ(${idx * 10}px)`,
                         zIndex: idx
                       }}
@@ -222,7 +260,7 @@ const App: React.FC = () => {
               {/* Mobile Image Stack (Carousel-ish) */}
               <div className="lg:hidden flex overflow-x-auto gap-4 pb-8 snap-x">
                  {SCATTER_IMAGES.map((img, idx) => (
-                    <img key={idx} src={img} alt="Evidence" className="w-64 h-auto flex-shrink-0 rounded-lg border-2 border-[#d4af37]/30 snap-center" />
+                    <img key={idx} src={img} alt="Evidence" className="w-72 h-auto flex-shrink-0 rounded-lg border-2 border-[#d4af37]/30 snap-center" />
                  ))}
               </div>
 
